@@ -50,6 +50,7 @@ bintray {
         userOrg = orgName
         websiteUrl = siteUrl
         vcsUrl = gitUrl
+        labels = bintrayLabels
         licenses = allLicenses
         publish = true
         publicDownloadNumbers = true

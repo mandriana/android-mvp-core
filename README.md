@@ -8,11 +8,11 @@ MVP Core is an Android Library which will help you to set up a MVP architecture 
 
 Currently available on JCenter, soon on Maven. You need to add the jcenter() repository to your module. Then in your module :
 ```groovy
-compile 'com.github.mandria:mvp-core:1.0'
+compile 'com.github.mandriana:mvp-core:1.0'
 // To use base views library
-compile 'com.github.mandria:mvp-base-views:1.0'
+compile 'com.github.mandriana:mvp-base-views:1.0'
 // To use base views with dagger module library
-compile 'com.github.mandria:mvp-base-views-dagger:1.0'
+compile 'com.github.mandriana:mvp-base-views-dagger:1.0'
 ```
 
 # CHANGELOG

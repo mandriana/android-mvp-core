@@ -61,7 +61,7 @@ ext {
     bintrayRepo = 'maven'
     orgName = 'michaelandria'
 
-    publishedGroupId = 'com.github.mandria'
+    publishedGroupId = 'com.github.mandriana'
     libraryName = 'MVP base views'
     artifact = 'mvp-base-views'
     libraryVersion = '1.0'
@@ -100,8 +100,8 @@ ext {
     bintrayRepo = 'maven'
     libraryDescription = 'A set of base views to be used with mvp-core'
 
-    siteUrl = 'https://github.com/michaelandria/android-mvp-core'
-    gitUrl = 'https://github.com/michaelandria/android-mvp-core.git'
+    siteUrl = 'https://github.com/mandriana/android-mvp-core'
+    gitUrl = 'https://github.com/mandriana/android-mvp-core.git'
 
     developerId = 'michaelandria'
     developerName = 'michaelandria'
@@ -110,8 +110,10 @@ ext {
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
+
+    bintrayLabels = ['aar', 'android', 'architecture', 'MVP']
 }
 
-ext.flavorToBuild = "noDagger"
+ext.flavorToBuild = "dagger"
 
 apply from: rootProject.file('gradleScripts/bintray-flavors.gradle')
