@@ -32,8 +32,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-    compile "com.github.mandria:mvp-core:$rootProject.ext.mvp_core"
-    compile "com.github.mandria:mvp-base-views-dagger:$rootProject.ext.mvp_views"
+    compile "com.github.mandriana:mvp-core:$rootProject.ext.mvp_core"
+    compile "com.github.mandriana:mvp-base-views-dagger:$rootProject.ext.mvp_views"
 
     apt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
 
