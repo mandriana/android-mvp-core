@@ -1,0 +1,54 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url  "https://dl.bintray.com/michaelandria/maven"
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url  "https://dl.bintray.com/michaelandria/maven"
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+ext {
+    // Sdk and tools
+    minSdkVersion = 16
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.2'
+
+    // Google dependencies
+    supportLibraryVersion = '25.3.1'
+
+    // Rx
+    rxAndroidVersion = '1.2.1'
+    rx2AndroidVersion = '2.0.1'
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    rxjava = '1.2.7'
+    rxjava2 = '2.0.6'
+
+    // Dagger
+    dagger = '2.10'
+
+    // MVP
+    mvp_core = '1.0'
+    mvp_views = '1.0'
+}

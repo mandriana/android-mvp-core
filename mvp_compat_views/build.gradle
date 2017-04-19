@@ -1,0 +1,117 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer.pro'
+        }
+    }
+
+    publishNonDefault true
+    productFlavors {
+        dagger {
+            ext.flavorVersion = '1.0'
+        }
+        noDagger {
+            ext.flavorVersion = '1.0'
+        }
+    }
+    defineOutputForAars(libraryVariants)
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Mvp library
+    compile 'com.github.mandria:mvp-core:1.0'
+
+    // Android support
+    compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+
+    // Dagger 2
+    daggerCompile "com.google.dagger:dagger:$rootProject.ext.dagger"
+    apt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
+    daggerProvided 'javax.annotation:jsr250-api:1.0'
+
+    testCompile 'junit:junit:4.12'
+}
+
+ext {
+    bintrayRepo = 'maven'
+    orgName = 'michaelandria'
+
+    publishedGroupId = 'com.github.mandria'
+    libraryName = 'MVP base views'
+    artifact = 'mvp-base-views'
+    libraryVersion = '1.0'
+
+    libraryDescription = ''
+
+    siteUrl = 'https://github.com/michaelandria/android-mvp-core'
+    gitUrl = 'https://github.com/michaelandria/android-mvp-core.git'
+
+    developerId = 'michaelandria'
+    developerName = 'michaelandria'
+    developerEmail = 'mika.andria@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+def getAarFileNameForVariant(variant) {
+    "${archivesBaseName}-${variant.flavorName}-${variant.productFlavors.get(0).flavorVersion}-${variant.buildType.name}.aar"
+}
+
+def defineOutputForAars(libraryVariants) {
+    libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                def fileName = getAarFileNameForVariant(variant)
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+}
+
+ext {
+    bintrayRepo = 'maven'
+    libraryDescription = 'A set of base views to be used with mvp-core'
+
+    siteUrl = 'https://github.com/michaelandria/android-mvp-core'
+    gitUrl = 'https://github.com/michaelandria/android-mvp-core.git'
+
+    developerId = 'michaelandria'
+    developerName = 'michaelandria'
+    developerEmail = 'mika.andria@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+ext.flavorToBuild = "noDagger"
+
+apply from: rootProject.file('gradleScripts/bintray-flavors.gradle')
