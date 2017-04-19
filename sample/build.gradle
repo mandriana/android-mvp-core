@@ -2,9 +2,6 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
-        maven {
-            url "https://dl.bintray.com/michaelandria/maven"
-        }
     }
     dependencies{
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
