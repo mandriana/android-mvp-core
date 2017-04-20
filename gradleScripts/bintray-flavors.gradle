@@ -99,7 +99,9 @@ def configPublish(variant) {
 
                 // adds pom data
                 pom.withXml {
+                    asNode().appendNode('name', libraryName)
                     asNode().appendNode('description', 'A set of default views (Activity and Fragment) to use with mvp-core')
+                    asNode().appendNode('url', siteUrl)
 
                     // creating additional node for dependencies
                     def dependenciesNode = asNode().appendNode('dependencies')
