@@ -4,15 +4,17 @@ MVP Core is an Android Library which will help you to set up a MVP architecture 
 - task continuation through orientation change, application paused with result notification to your view as soon as the view is available
 - task cancellation
 
+This version supports RxJava 2.
+
 # Download
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core:1.0'
+compile 'com.github.mandriana:mvp-core-rx2:1.0'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views:1.0'
+compile 'com.github.mandriana:mvp-base-views-rx2:1.0'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-dagger:1.0'
+compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0'
 ```
 
 # CHANGELOG

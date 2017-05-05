@@ -31,8 +31,9 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':mvp')
-    compile project(path: ':mvp_compat_views', configuration: 'daggerDebug')
+
+    compile "com.github.mandriana:mvp-core-rx2:$rootProject.ext.mvp_core"
+    compile "com.github.mandriana:mvp-base-views-rx2-dagger:$rootProject.ext.mvp_views"
 
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
     apt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"

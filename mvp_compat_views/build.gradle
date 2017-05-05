@@ -44,7 +44,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // Mvp library
-    compile project(':mvp')
+    compile "com.github.mandriana:mvp-core-rx2:$rootProject.ext.mvp_core"
+//    compile project(':mvp')
 
     // Android support
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
