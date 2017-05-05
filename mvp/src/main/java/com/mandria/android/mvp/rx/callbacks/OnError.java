@@ -1,10 +1,10 @@
 package com.mandria.android.mvp.rx.callbacks;
 
-import rx.functions.Action2;
+import io.reactivex.functions.BiConsumer;
 
 /**
  * Interface for onError handler.
  */
-public interface OnError<U> extends Action2<U, Throwable> {
+public interface OnError<U> extends BiConsumer<U, Throwable> {
 
 }

@@ -1,10 +1,10 @@
 package com.mandria.android.mvp.rx.callbacks;
 
-import rx.functions.Action2;
+import io.reactivex.functions.BiConsumer;
 
 /**
  * Interface for onNext handler.
  */
-public interface OnNext<U, V> extends Action2<U, V> {
+public interface OnNext<U, V> extends BiConsumer<U, V> {
 
 }

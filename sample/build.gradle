@@ -3,7 +3,7 @@ buildscript {
         jcenter()
         mavenCentral()
     }
-    dependencies{
+    dependencies {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
@@ -12,12 +12,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "com.mandria.android.mvp.example"
-        minSdkVersion 21
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -30,12 +30,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':mvp')
+    compile project(path: ':mvp_compat_views', configuration: 'daggerDebug')
+
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-    compile "com.github.mandriana:mvp-core:$rootProject.ext.mvp_core"
-    compile "com.github.mandriana:mvp-base-views-dagger:$rootProject.ext.mvp_views"
-
     apt "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
-
     testCompile 'junit:junit:4.12'
 }

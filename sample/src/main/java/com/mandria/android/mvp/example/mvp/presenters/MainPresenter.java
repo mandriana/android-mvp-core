@@ -30,24 +30,24 @@ public class MainPresenter extends RxPresenter<MainView> {
     }
 
     public void doStuff() {
-        start(TASK_DO_STUFF, mTaskManager.longTask(),
+        start(TASK_DO_STUFF, mTaskManager.longMaybe(), true,
                 new OnNext<MainView, String>() {
                     @Override
-                    public void call(@NonNull MainView mainView, @NonNull String s) {
-                        Log.d(TAG, String.format("Task onNext : %s", s));
+                    public void accept(MainView mainView, String s) throws Exception {
+                        Log.d(TAG, "Task emitted : " + s);
                         mainView.onTaskSuccess(s);
                     }
                 },
                 new OnError<MainView>() {
                     @Override
-                    public void call(@NonNull MainView mainView, @NonNull Throwable throwable) {
+                    public void accept(@NonNull MainView mainView, @NonNull Throwable throwable) {
                         Log.e(TAG, "Task failed", throwable);
                         mainView.onTaskFailed();
                     }
                 },
                 new OnCompleted<MainView>() {
                     @Override
-                    public void call(@NonNull MainView mainView) {
+                    public void accept(@NonNull MainView mainView) {
                         Log.d(TAG, "Task completed");
                     }
                 });
