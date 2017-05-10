@@ -19,6 +19,10 @@ compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0'
 
 # CHANGELOG
 
+## 1.0.1
+
+Fixed the startOnViewAttached method so that the action is started instead of added to the queue if the view is already attached.
+
 ## 1.0.0
 
 Project available
