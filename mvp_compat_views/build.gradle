@@ -66,7 +66,7 @@ ext {
     artifact = 'mvp-base-views'
     libraryVersion = '1.0'
 
-    libraryDescription = ''
+    libraryDescription = 'A set of base views to be used with mvp-core'
 
     siteUrl = 'https://github.com/michaelandria/android-mvp-core'
     gitUrl = 'https://github.com/michaelandria/android-mvp-core.git'
@@ -78,6 +78,8 @@ ext {
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     allLicenses = ["Apache-2.0"]
+
+    bintrayLabels = ['aar', 'android', 'architecture', 'MVP']
 }
 
 def getAarFileNameForVariant(variant) {
@@ -94,24 +96,6 @@ def defineOutputForAars(libraryVariants) {
             }
         }
     }
-}
-
-ext {
-    bintrayRepo = 'maven'
-    libraryDescription = 'A set of base views to be used with mvp-core'
-
-    siteUrl = 'https://github.com/mandriana/android-mvp-core'
-    gitUrl = 'https://github.com/mandriana/android-mvp-core.git'
-
-    developerId = 'michaelandria'
-    developerName = 'michaelandria'
-    developerEmail = 'mika.andria@gmail.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-
-    bintrayLabels = ['aar', 'android', 'architecture', 'MVP']
 }
 
 ext.flavorToBuild = "dagger"
