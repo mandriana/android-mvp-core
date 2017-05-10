@@ -266,7 +266,15 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param action Action to call once view is attached.
      */
     public void startOnViewAttached(final String tag, final Action action) {
-        mQueue.put(tag, action);
+        if (mView.getValue() != null && mView.getValue().view != null) {
+            try {
+                action.run();
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+        } else {
+            mQueue.put(tag, action);
+        }
     }
 
     /**
