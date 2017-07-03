@@ -63,7 +63,7 @@ public class RxPresenter<V> extends Presenter<V> {
     /**
      * Actions queue.
      */
-    private final HashMap<String, Action0> mQueue = new HashMap<>();
+    private final HashMap<String, Action1<V>> mQueue = new HashMap<>();
 
     @CallSuper
     @Override
@@ -89,7 +89,7 @@ public class RxPresenter<V> extends Presenter<V> {
     protected void onViewAttached(V view) {
         Log.d(TAG, "View attached");
         mView.onNext(view);
-        resumeQueue();
+        resumeQueue(view);
         resumeAll();
     }
 
@@ -315,21 +315,21 @@ public class RxPresenter<V> extends Presenter<V> {
      * The tag is used to remove the observable from the task queue if not started yet.
      * In case it already started, calls {@link #cancel(String)} with the given tag, i.e. the tag parameter
      * should be the same as the one used with {@link #start} methods (observable tag).
-     * This is intended to be used when {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])} need to
+     * This is intended, for instance, to be used when {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])} need to
      * start a task once view is attached.
      *
-     * @param tag     Action tag (ideally same as observable tag if an observable should be started in the action0 param).
-     * @param action0 Action to call once view is attached.
+     * @param tag    Action tag (ideally same as observable tag if an observable should be started in the action0 param).
+     * @param action Action to call once view is attached.
      */
-    public void startOnViewAttached(final String tag, final Action0 action0) {
+    public void startOnViewAttached(final String tag, final Action1<V> action) {
         if (mView.getValue() != null) {
             try {
-                action0.call();
+                action.call(mView.getValue());
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
         } else {
-            mQueue.put(tag, action0);
+            mQueue.put(tag, action);
         }
     }
 
@@ -348,13 +348,15 @@ public class RxPresenter<V> extends Presenter<V> {
 
     /**
      * Resumes the queue.
+     *
+     * @param view The view attached to the presenter.
      */
-    private void resumeQueue() {
+    private void resumeQueue(V view) {
         if (!mQueue.isEmpty()) {
-            Iterator<Map.Entry<String, Action0>> queueIterator = mQueue.entrySet().iterator();
+            Iterator<Map.Entry<String, Action1<V>>> queueIterator = mQueue.entrySet().iterator();
             while (queueIterator.hasNext()) {
-                Map.Entry<String, Action0> next = queueIterator.next();
-                next.getValue().call();
+                Map.Entry<String, Action1<V>> next = queueIterator.next();
+                next.getValue().call(view);
                 queueIterator.remove();
             }
         }
