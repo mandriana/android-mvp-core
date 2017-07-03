@@ -10,9 +10,9 @@ Available on JCenter and MavenCentral. In your module :
 ```groovy
 compile 'com.github.mandriana:mvp-core:1.0.2'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views:1.0'
+compile 'com.github.mandriana:mvp-base-views:1.0.2'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-dagger:1.0'
+compile 'com.github.mandriana:mvp-base-views-dagger:1.0.2'
 ```
 
 # CHANGELOG
