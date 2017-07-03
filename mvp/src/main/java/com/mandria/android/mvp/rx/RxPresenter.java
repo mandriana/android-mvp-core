@@ -69,7 +69,7 @@ public class RxPresenter<V> extends Presenter<V> {
     /**
      * Actions queue.
      */
-    private final HashMap<String, Action> mQueue = new HashMap<>();
+    private final HashMap<String, Consumer<V>> mQueue = new HashMap<>();
 
     @CallSuper
     @Override
@@ -95,7 +95,7 @@ public class RxPresenter<V> extends Presenter<V> {
     protected void onViewAttached(V view) {
         Log.d(TAG, "View attached");
         mView.onNext(new RxView<>(view));
-        resumeQueue();
+        resumeQueue(view);
         resumeAll();
     }
 
@@ -263,17 +263,17 @@ public class RxPresenter<V> extends Presenter<V> {
      * start a task once view is attached.
      *
      * @param tag    Action tag (ideally same as observable tag if an observable should be started in the action0 param).
-     * @param action Action to call once view is attached.
+     * @param consumer Consumer to call once view is attached.
      */
-    public void startOnViewAttached(final String tag, final Action action) {
+    public void startOnViewAttached(final String tag, final Consumer<V> consumer) {
         if (mView.getValue() != null && mView.getValue().view != null) {
             try {
-                action.run();
+                consumer.accept(mView.getValue().view);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
         } else {
-            mQueue.put(tag, action);
+            mQueue.put(tag, consumer);
         }
     }
 
@@ -293,13 +293,13 @@ public class RxPresenter<V> extends Presenter<V> {
     /**
      * Resumes the queue.
      */
-    private void resumeQueue() {
+    private void resumeQueue(V view) {
         if (!mQueue.isEmpty()) {
-            Iterator<Map.Entry<String, Action>> queueIterator = mQueue.entrySet().iterator();
+            Iterator<Map.Entry<String, Consumer<V>>> queueIterator = mQueue.entrySet().iterator();
             while (queueIterator.hasNext()) {
-                Map.Entry<String, Action> next = queueIterator.next();
+                Map.Entry<String, Consumer<V>> next = queueIterator.next();
                 try {
-                    next.getValue().run();
+                    next.getValue().accept(view);
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }

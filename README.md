@@ -10,14 +10,19 @@ This version supports RxJava 2.
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core-rx2:1.0.1'
+compile 'com.github.mandriana:mvp-core-rx2:1.0.2'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views-rx2:1.0'
+compile 'com.github.mandriana:mvp-base-views-rx2:1.0.2'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0'
+compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.2'
 ```
 
 # CHANGELOG
+
+## 1.0.2
+
+startOnViewAttached now accepts an Action1 to provide the view as action parameter.
+Upgraded dependencies versions.
 
 ## 1.0.1
 
