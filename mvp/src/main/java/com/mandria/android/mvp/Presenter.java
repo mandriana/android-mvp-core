@@ -18,18 +18,21 @@ public abstract class Presenter<V> {
      * @param savedState The bundle used to save presenter data, may be null.
      */
     protected void onCreate(@Nullable Bundle savedState) {
+        MVPLogger.d(getClass().getSimpleName(), "On create presenter");
     }
 
     /**
      * This method is called after the presenter is created and attached the first time to the view.
      */
     protected void onCreatedThenAttached() {
+        MVPLogger.d(getClass().getSimpleName(), "On present created then view attached");
     }
 
     /**
      * This method is called when the user leaves the view.
      */
     protected void onDestroy() {
+        MVPLogger.d(getClass().getSimpleName(), "On destroy presenter");
     }
 
     /**
@@ -38,6 +41,7 @@ public abstract class Presenter<V> {
      * @param state Presenter bundle state.
      */
     protected void onSave(Bundle state) {
+        MVPLogger.d(getClass().getSimpleName(), "On save presenter state");
     }
 
     /**
@@ -46,12 +50,14 @@ public abstract class Presenter<V> {
      * @param view The view which is now attached.
      */
     protected void onViewAttached(V view) {
+        MVPLogger.d(getClass().getSimpleName(), String.format("View %s is attached to presenter", mView.getClass().getSimpleName()));
     }
 
     /**
      * This method is called when the view is detached from this presenter.
      */
     protected void onViewDetached() {
+        MVPLogger.d(getClass().getSimpleName(), String.format("View %s is detached to presenter", mView.getClass().getSimpleName()));
     }
 
     /**

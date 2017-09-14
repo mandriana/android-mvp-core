@@ -1,5 +1,6 @@
 package com.mandria.android.mvp.rx;
 
+import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.Presenter;
 import com.mandria.android.mvp.rx.callbacks.OnCompleted;
 import com.mandria.android.mvp.rx.callbacks.OnError;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class RxPresenter<V> extends Presenter<V> {
 
-    private static final String TAG = "RxPresenter";
+    private final String mTag = getClass().getSimpleName();
 
     /**
      * Behavior subject to fire the cache removal off all awaiting task.
@@ -68,6 +68,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
+        super.onCreate(savedState);
+
         mSubscriptions = new CompositeSubscription();
         mCacheSynchronization.subscribe(new Action1<Boolean>() {
             @Override
@@ -87,7 +89,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onViewAttached(V view) {
-        Log.d(TAG, "View attached");
+        super.onViewAttached(view);
+
         mView.onNext(view);
         resumeQueue(view);
         resumeAll();
@@ -96,7 +99,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onViewDetached() {
-        Log.d(TAG, "View detached");
+        super.onViewDetached();
+
         mView.onNext(null);
         unsubscribeAll();
     }
@@ -104,6 +108,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onDestroy() {
+        super.onDestroy();
+
         mView.onCompleted();
         mCacheSynchronization.onCompleted();
         cancelAll();
@@ -179,7 +185,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param tag Observable tag to remove.
      */
     private void removeFromCache(String tag) {
-        Log.d(TAG, String.format("Remove %s from cache", tag));
+        MVPLogger.d(mTag, String.format("Remove %s from cache", tag));
         mCache.remove(tag);
     }
 
@@ -232,7 +238,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             mCache.put(tag, null);
 
-            Log.d(TAG, String.format("Starting task : %s", tag));
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 observable = observable.compose(RxUtils.<Result>applyIOScheduler());
             }
@@ -267,7 +273,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
             mCache.put(tag, cached);
         } else {
-            Log.d(TAG, String.format("Resuming task : %s", tag));
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
 
         if (cached != null) {
@@ -326,7 +332,7 @@ public class RxPresenter<V> extends Presenter<V> {
             try {
                 action.call(mView.getValue());
             } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
+                MVPLogger.e(mTag, e.getMessage());
             }
         } else {
             mQueue.put(tag, action);
@@ -353,9 +359,11 @@ public class RxPresenter<V> extends Presenter<V> {
      */
     private void resumeQueue(V view) {
         if (!mQueue.isEmpty()) {
+            MVPLogger.d(mTag, String.format("%s action waited for view attached to start", mQueue.size()));
             Iterator<Map.Entry<String, Action1<V>>> queueIterator = mQueue.entrySet().iterator();
             while (queueIterator.hasNext()) {
                 Map.Entry<String, Action1<V>> next = queueIterator.next();
+                MVPLogger.d(mTag, String.format("Calling action for tag : %s", next.getKey()));
                 next.getValue().call(view);
                 queueIterator.remove();
             }
