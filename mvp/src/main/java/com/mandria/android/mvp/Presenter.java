@@ -25,7 +25,7 @@ public abstract class Presenter<V> {
      * This method is called after the presenter is created and attached the first time to the view.
      */
     protected void onCreatedThenAttached() {
-        MVPLogger.d(getClass().getSimpleName(), "On present created then view attached");
+        MVPLogger.d(getClass().getSimpleName(), "On presenter created then view attached");
     }
 
     /**
