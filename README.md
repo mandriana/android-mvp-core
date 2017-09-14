@@ -10,14 +10,20 @@ This version supports RxJava 2.
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core-rx2:1.0.2'
+compile 'com.github.mandriana:mvp-core-rx2:1.0.4'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views-rx2:1.0.2'
+compile 'com.github.mandriana:mvp-base-views-rx2:1.0.4'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.2'
+compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.4'
 ```
 
 # CHANGELOG
+
+## 1.0.4
+
+Upgraded dependencies versions.
+Fixed a bug when retrieving a presenter from the cache when multiple views with presenters were created in a very short time.
+Added logs and ability to activate/deactivate them.
 
 ## 1.0.2
 

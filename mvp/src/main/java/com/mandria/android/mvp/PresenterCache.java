@@ -1,8 +1,6 @@
 package com.mandria.android.mvp;
 
-import android.util.LongSparseArray;
-
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.HashMap;
 
 /**
  * <p>A cache for the presenter.</p>
@@ -10,16 +8,18 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class PresenterCache {
 
-    private final AtomicLong mNextId;
+    private static final String TAG = "PresenterCache";
 
-    private final LongSparseArray<Presenter> mCache;
+    private HashMap<String, Presenter> mIdToPresenter = new HashMap<>();
+
+    private HashMap<Presenter, String> mPresenterToId = new HashMap<>();
 
     /**
      * Constructor.
      */
     public PresenterCache() {
-        mNextId = new AtomicLong();
-        mCache = new LongSparseArray<>();
+        mIdToPresenter = new HashMap<>();
+        mPresenterToId = new HashMap<>();
     }
 
     /**
@@ -30,8 +30,8 @@ public class PresenterCache {
      * @return The presenter of the corresponding id.
      */
     @SuppressWarnings("unchecked")
-    <P> P getPresenter(Long id) {
-        return (P) mCache.get(id);
+    <P> P getPresenter(String id) {
+        return (P) mIdToPresenter.get(id);
     }
 
     /**
@@ -40,7 +40,12 @@ public class PresenterCache {
      * @param presenter Presenter to save.
      */
     void savePresenter(Presenter presenter) {
-        mCache.put(mNextId.incrementAndGet(), presenter);
+        String id = presenter.getClass().getSimpleName() + "/" + System.nanoTime() + "/" + (int) (Math.random() * Integer.MAX_VALUE);
+
+        MVPLogger.d(TAG, String.format("Saving presenter %s to cache with id %s", presenter.getClass().getSimpleName(), id));
+
+        mIdToPresenter.put(id, presenter);
+        mPresenterToId.put(presenter, id);
     }
 
     /**
@@ -49,12 +54,8 @@ public class PresenterCache {
      * @param presenter Presenter to retrieve the id from.
      * @return The presenter id or null.
      */
-    Long getId(Presenter presenter) {
-        int index = mCache.indexOfValue(presenter);
-        if (index >= 0) {
-            return mCache.keyAt(index);
-        }
-        return null;
+    String getId(Presenter presenter) {
+        return mPresenterToId.get(presenter);
     }
 
     /**
@@ -63,16 +64,16 @@ public class PresenterCache {
      * @param presenter Presenter to remove.
      */
     void removePresenter(Presenter presenter) {
-        Long id = getId(presenter);
-        if (id != null) {
-            mCache.delete(id);
-        }
+        MVPLogger.d(TAG, String.format("Removing presenter %s from cache", presenter.getClass().getSimpleName()));
+
+        mIdToPresenter.remove(mPresenterToId.get(presenter));
     }
 
     /**
      * Removes all the presenter from the cache.
      */
     public void clear() {
-        mCache.clear();
+        mPresenterToId.clear();
+        mIdToPresenter.clear();
     }
 }

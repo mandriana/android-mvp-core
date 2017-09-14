@@ -8,7 +8,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.2"
+        versionName "1.0.4"
     }
     buildTypes {
         release {
@@ -39,7 +39,7 @@ ext {
     publishedGroupId = 'com.github.mandriana'
     libraryName = 'MVPCore'
     artifact = 'mvp-core-rx2'
-    libraryVersion = '1.0.2'
+    libraryVersion = '1.0.4'
 
     libraryDescription = 'A library to set up a mvp architecture on Android'
 

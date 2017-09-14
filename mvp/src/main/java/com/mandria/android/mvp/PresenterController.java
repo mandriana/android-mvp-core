@@ -40,7 +40,7 @@ public abstract class PresenterController<P extends Presenter> {
         // Try to retrieve presenter from cache
         // Bundle should not be null if presenter is already in cache
         if (mPresenter == null && mBundle != null) {
-            mPresenter = mPresenterCache.getPresenter(mBundle.getLong(PRESENTER_ID_KEY));
+            mPresenter = mPresenterCache.getPresenter(mBundle.getString(PRESENTER_ID_KEY));
         }
 
         return mPresenter != null;
@@ -100,7 +100,7 @@ public abstract class PresenterController<P extends Presenter> {
             controllerBundle.putBundle(PRESENTER_BUNDLE_KEY, presenterBundle);
 
             // Saves the presenter id in the bundle to reattach the view to the presenter
-            controllerBundle.putLong(PRESENTER_ID_KEY, mPresenterCache.getId(mPresenter));
+            controllerBundle.putString(PRESENTER_ID_KEY, mPresenterCache.getId(mPresenter));
         }
         return controllerBundle;
     }

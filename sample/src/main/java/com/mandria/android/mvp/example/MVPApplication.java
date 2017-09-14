@@ -1,5 +1,6 @@
 package com.mandria.android.mvp.example;
 
+import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.di.CoreModule;
 import com.mandria.android.mvp.example.di.components.AppComponent;
 import com.mandria.android.mvp.example.di.components.DaggerAppComponent;
@@ -17,6 +18,8 @@ public class MVPApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        MVPLogger.SHOW_MVP_LOGS = true;
 
         initializeInjector();
     }

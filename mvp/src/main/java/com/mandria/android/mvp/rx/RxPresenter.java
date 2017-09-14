@@ -1,5 +1,6 @@
 package com.mandria.android.mvp.rx;
 
+import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.Presenter;
 import com.mandria.android.mvp.rx.callbacks.OnCompleted;
 import com.mandria.android.mvp.rx.callbacks.OnError;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import io.reactivex.subjects.BehaviorSubject;
  */
 public class RxPresenter<V> extends Presenter<V> {
 
-    private static final String TAG = "RxPresenter";
+    private final String mTag = getClass().getSimpleName();
 
     /**
      * Behavior subject to fire the cache removal off all awaiting task.
@@ -74,6 +74,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
+        super.onCreate(savedState);
+
         mDisposables = new CompositeDisposable();
         mCacheSynchronization.subscribe(new Consumer<Boolean>() {
             @Override
@@ -93,7 +95,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onViewAttached(V view) {
-        Log.d(TAG, "View attached");
+        super.onViewAttached(view);
+
         mView.onNext(new RxView<>(view));
         resumeQueue(view);
         resumeAll();
@@ -102,7 +105,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onViewDetached() {
-        Log.d(TAG, "View detached");
+        super.onViewDetached();
+
         mView.onNext(new RxView<V>(null));
         disposeAll();
     }
@@ -110,6 +114,8 @@ public class RxPresenter<V> extends Presenter<V> {
     @CallSuper
     @Override
     protected void onDestroy() {
+        super.onDestroy();
+
         mView.onComplete();
         mCacheSynchronization.onComplete();
         cancelAll();
@@ -184,7 +190,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param tag Observable tag to remove.
      */
     private void removeFromCache(String tag) {
-        Log.d(TAG, String.format("Remove %s from cache", tag));
+        MVPLogger.d(mTag, String.format("Remove %s from cache", tag));
         mCache.remove(tag);
     }
 
@@ -270,7 +276,7 @@ public class RxPresenter<V> extends Presenter<V> {
             try {
                 consumer.accept(mView.getValue().view);
             } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
+                MVPLogger.e(mTag, e.getMessage());
             }
         } else {
             mQueue.put(tag, consumer);
@@ -295,13 +301,15 @@ public class RxPresenter<V> extends Presenter<V> {
      */
     private void resumeQueue(V view) {
         if (!mQueue.isEmpty()) {
+            MVPLogger.d(mTag, String.format("%s action waited for view attached to start", mQueue.size()));
             Iterator<Map.Entry<String, Consumer<V>>> queueIterator = mQueue.entrySet().iterator();
             while (queueIterator.hasNext()) {
                 Map.Entry<String, Consumer<V>> next = queueIterator.next();
                 try {
+                    MVPLogger.d(mTag, String.format("Calling action for tag : %s", next.getKey()));
                     next.getValue().accept(view);
                 } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
+                    MVPLogger.e(mTag, e.getMessage());
                 }
                 queueIterator.remove();
             }
@@ -348,7 +356,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             mCache.put(tag, null);
 
-            Log.d(TAG, String.format("Starting task : %s", tag));
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 observable = observable.compose(RxUtils.<Result>applyObservableIOScheduler());
             }
@@ -360,7 +368,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
             mCache.put(tag, cached);
         } else {
-            Log.d(TAG, String.format("Resuming task : %s", tag));
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
 
         if (cached != null) {
@@ -433,7 +441,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             mCache.put(tag, null);
 
-            Log.d(TAG, String.format("Starting task : %s", tag));
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 flowable = flowable.compose(RxUtils.<Result>applyFlowableIOScheduler());
             }
@@ -445,7 +453,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
             mCache.put(tag, cached);
         } else {
-            Log.d(TAG, String.format("Resuming task : %s", tag));
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
 
         if (cached != null) {
@@ -518,7 +526,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             mCache.put(tag, null);
 
-            Log.d(TAG, String.format("Starting task : %s", tag));
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 single = single.compose(RxUtils.<Result>applySingleIOScheduler());
             }
@@ -530,7 +538,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
             mCache.put(tag, cached);
         } else {
-            Log.d(TAG, String.format("Resuming task : %s", tag));
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
 
         if (cached != null) {
@@ -602,7 +610,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             mCache.put(tag, null);
 
-            Log.d(TAG, String.format("Starting task : %s", tag));
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 completable = completable.compose(RxUtils.<Result>applyCompletableIOScheduler());
             }
@@ -614,7 +622,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
             mCache.put(tag, cached);
         } else {
-            Log.d(TAG, String.format("Resuming task : %s", tag));
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
 
         if (cached != null) {
@@ -671,7 +679,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             mCache.put(tag, null);
 
-            Log.d(TAG, String.format("Starting task : %s", tag));
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 maybe = maybe.compose(RxUtils.<Result>applyMaybeIOScheduler());
             }
@@ -683,7 +691,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
             mCache.put(tag, cached);
         } else {
-            Log.d(TAG, String.format("Resuming task : %s", tag));
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
 
         if (cached != null) {
