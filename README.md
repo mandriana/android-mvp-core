@@ -10,7 +10,7 @@ This version supports RxJava 2.
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core-rx2:1.0.4'
+compile 'com.github.mandriana:mvp-core-rx2:1.0.5'
 // To use base views library
 compile 'com.github.mandriana:mvp-base-views-rx2:1.0.4'
 // To use base views with dagger module library
@@ -19,7 +19,7 @@ compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.4'
 
 # CHANGELOG
 
-## 1.0.5
+## 1.0.5 (Core only)
 
 Upgraded dependencies versions.
 Fixed tag in AbstractSubscriptionProxy.

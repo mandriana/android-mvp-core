@@ -48,6 +48,6 @@ ext {
     dagger = '2.10'
 
     // MVP
-    mvp_core = '1.0.4'
+    mvp_core = '1.0.5'
     mvp_views = '1.0.4'
 }
