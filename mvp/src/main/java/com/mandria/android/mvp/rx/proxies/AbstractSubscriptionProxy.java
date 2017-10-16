@@ -1,9 +1,8 @@
 package com.mandria.android.mvp.rx.proxies;
 
+import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.rx.BoundData;
 import com.mandria.android.mvp.rx.RxView;
-
-import android.util.Log;
 
 import io.reactivex.Notification;
 import io.reactivex.annotations.NonNull;
@@ -14,12 +13,12 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * An abstract class to manipulate subscription proxies.
  */
 public abstract class AbstractSubscriptionProxy<View, Result> {
+
+    private final String mTag = getClass().getSimpleName();
 
     /**
      * Action wrapper to run on original stream termination.
@@ -64,7 +63,7 @@ public abstract class AbstractSubscriptionProxy<View, Result> {
                 try {
                     onTerminate.run();
                 } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
+                    MVPLogger.e(mTag, e.getMessage());
                 }
             }
         };

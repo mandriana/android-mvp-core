@@ -19,6 +19,11 @@ compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.4'
 
 # CHANGELOG
 
+## 1.0.5
+
+Upgraded dependencies versions.
+Fixed tag in AbstractSubscriptionProxy.
+
 ## 1.0.4
 
 Upgraded dependencies versions.
