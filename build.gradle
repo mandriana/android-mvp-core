@@ -32,7 +32,7 @@ ext {
     buildToolsVersion = '26.0.1'
 
     // Google dependencies
-    supportLibraryVersion = '26.0.2'
+    supportLibraryVersion = '26.1.0'
 
     // Rx
     rxAndroidVersion = '1.2.1'

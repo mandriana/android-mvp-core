@@ -10,12 +10,16 @@ Available on JCenter and MavenCentral. In your module :
 ```groovy
 compile 'com.github.mandriana:mvp-core:1.0.4'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views:1.0.4'
+compile 'com.github.mandriana:mvp-base-views:1.0.5'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-dagger:1.0.4'
+compile 'com.github.mandriana:mvp-base-views-dagger:1.0.5'
 ```
 
 # CHANGELOG
+
+## 1.0.5 (mvp-base-views with and without dagger)
+
+Fixed presenter lifecycle in onPause, onDestroy and finish.
 
 ## 1.0.4
 
