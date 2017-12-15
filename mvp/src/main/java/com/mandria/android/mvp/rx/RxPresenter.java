@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -59,7 +60,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * Map of cached observables.
      * Operations on this map should be synchronized to avoid concurrency access.
      */
-    private final HashMap<String, CacheableStream<V, ?>> mCache = new HashMap<>();
+    private final ConcurrentHashMap<String, CacheableStream<V, ?>> mCache = new ConcurrentHashMap<>();
 
     /**
      * Stores the subscriptions to release them in {@link #destroy()} call.
@@ -268,7 +269,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * This is intended to be used when {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])} need to
      * start a task once view is attached.
      *
-     * @param tag    Action tag (ideally same as observable tag if an observable should be started in the action0 param).
+     * @param tag      Action tag (ideally same as observable tag if an observable should be started in the action0 param).
      * @param consumer Consumer to call once view is attached.
      */
     public void startOnViewAttached(final String tag, final Consumer<V> consumer) {
@@ -354,8 +355,6 @@ public class RxPresenter<V> extends Presenter<V> {
         CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
-            mCache.put(tag, null);
-
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 observable = observable.compose(RxUtils.<Result>applyObservableIOScheduler());
@@ -366,7 +365,13 @@ public class RxPresenter<V> extends Presenter<V> {
                     getCacheableOnTerminateAction(tag),
                     getCacheableStreamConsumer(onNext, onError, onCompleted));
 
-            mCache.put(tag, cached);
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
+            }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
@@ -439,8 +444,6 @@ public class RxPresenter<V> extends Presenter<V> {
         CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
-            mCache.put(tag, null);
-
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 flowable = flowable.compose(RxUtils.<Result>applyFlowableIOScheduler());
@@ -451,7 +454,13 @@ public class RxPresenter<V> extends Presenter<V> {
                     getCacheableOnTerminateAction(tag),
                     getCacheableStreamConsumer(onNext, onError, onCompleted));
 
-            mCache.put(tag, cached);
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
+            }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
@@ -524,8 +533,6 @@ public class RxPresenter<V> extends Presenter<V> {
         CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
-            mCache.put(tag, null);
-
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 single = single.compose(RxUtils.<Result>applySingleIOScheduler());
@@ -536,7 +543,13 @@ public class RxPresenter<V> extends Presenter<V> {
                     getCacheableOnTerminateAction(tag),
                     getCacheableStreamConsumer(onNext, onError, onCompleted));
 
-            mCache.put(tag, cached);
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
+            }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
@@ -608,8 +621,6 @@ public class RxPresenter<V> extends Presenter<V> {
         CacheableStream<V, Object> cached = (CacheableStream<V, Object>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
-            mCache.put(tag, null);
-
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 completable = completable.compose(RxUtils.<Result>applyCompletableIOScheduler());
@@ -620,7 +631,13 @@ public class RxPresenter<V> extends Presenter<V> {
                     getCacheableOnTerminateAction(tag),
                     getCacheableStreamConsumer(null, onError, onCompleted));
 
-            mCache.put(tag, cached);
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Object>) mCache.get(tag);
+            }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
@@ -677,8 +694,6 @@ public class RxPresenter<V> extends Presenter<V> {
         CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
-            mCache.put(tag, null);
-
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 maybe = maybe.compose(RxUtils.<Result>applyMaybeIOScheduler());
@@ -689,7 +704,13 @@ public class RxPresenter<V> extends Presenter<V> {
                     getCacheableOnTerminateAction(tag),
                     getCacheableStreamConsumer(onNext, onError, onCompleted));
 
-            mCache.put(tag, cached);
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
+            }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }
