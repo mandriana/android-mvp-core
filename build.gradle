@@ -4,9 +4,10 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
     }
@@ -34,7 +35,7 @@ ext {
     buildToolsVersion = '26.0.2'
 
     // Google dependencies
-    supportLibraryVersion = '26.1.0'
+    supportLibraryVersion = '27.0.2'
 
     // Rx
     rxAndroidVersion = '1.2.1'
