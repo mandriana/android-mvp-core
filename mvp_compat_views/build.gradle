@@ -88,12 +88,12 @@ def defineOutputForAars(libraryVariants) {
         variant.outputs.all { output ->
             if (outputFileName != null && outputFileName.endsWith('.aar')) {
                 def fileName = getAarFileNameForVariant(variant)
-                outputFileName = new File(output.outputFile.parent, fileName)
+                outputFileName = new File(fileName)
             }
         }
     }
 }
 
-ext.flavorToBuild = "dagger"
+ext.flavorToBuild = "noDagger"
 
 apply from: rootProject.file('gradleScripts/bintray-flavors.gradle')

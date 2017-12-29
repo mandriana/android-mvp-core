@@ -17,32 +17,6 @@ compile 'com.github.mandriana:mvp-base-views-rx2:1.0.4'
 compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.4'
 ```
 
-# CHANGELOG
-
-## 1.0.5 (Core only)
-
-Upgraded dependencies versions.
-Fixed tag in AbstractSubscriptionProxy.
-
-## 1.0.4
-
-Upgraded dependencies versions.
-Fixed a bug when retrieving a presenter from the cache when multiple views with presenters were created in a very short time.
-Added logs and ability to activate/deactivate them.
-
-## 1.0.2
-
-startOnViewAttached now accepts an Action1 to provide the view as action parameter.
-Upgraded dependencies versions.
-
-## 1.0.1
-
-Fixed the startOnViewAttached method so that the action is started instead of added to the queue if the view is already attached.
-
-## 1.0.0
-
-Project available
-
 # Community
 
 Looking for contributors, feel free to fork !
