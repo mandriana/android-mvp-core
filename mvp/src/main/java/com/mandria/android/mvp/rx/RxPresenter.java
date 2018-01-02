@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import rx.Notification;
 import rx.Observable;
@@ -53,7 +54,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * Map of cached observables.
      * Operations on this map should be synchronized to avoid concurrency access.
      */
-    private final HashMap<String, CacheableObservable<V, ?>> mCache = new HashMap<>();
+    private final ConcurrentHashMap<String, CacheableObservable<V, ?>> mCache = new ConcurrentHashMap<>();
 
     /**
      * Stores the subscriptions to release them in {@link #destroy()} call.
@@ -236,8 +237,6 @@ public class RxPresenter<V> extends Presenter<V> {
         CacheableObservable<V, Result> cached = (CacheableObservable<V, Result>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
-            mCache.put(tag, null);
-
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
                 observable = observable.compose(RxUtils.<Result>applyIOScheduler());
@@ -271,7 +270,13 @@ public class RxPresenter<V> extends Presenter<V> {
                         }
                     });
 
-            mCache.put(tag, cached);
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableObservable<V, Result>) mCache.get(tag);
+            }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
         }

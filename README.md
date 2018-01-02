@@ -8,40 +8,12 @@ MVP Core is an Android Library which will help you to set up a MVP architecture 
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core:1.0.4'
+compile 'com.github.mandriana:mvp-core:1.0.6'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views:1.0.5'
+compile 'com.github.mandriana:mvp-base-views:1.0.6'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-dagger:1.0.5'
+compile 'com.github.mandriana:mvp-base-views-dagger:1.0.6'
 ```
-
-# CHANGELOG
-
-## 1.0.5 (mvp-base-views with and without dagger)
-
-Fixed presenter lifecycle in onPause, onDestroy and finish.
-
-## 1.0.4
-
-Added logs and ability to activate/deactivate them.
-
-## 1.0.3
-
-Upgraded dependencies versions.
-Fixed a bug when retrieving a presenter from the cache when multiple views with presenters were created in a very short time.
-
-## 1.0.2
-
-startOnViewAttached now accepts an Action1 to provide the view as action parameter.
-Upgraded dependencies versions.
-
-## 1.0.1
-
-Fixed the startOnViewAttached method so that the action is started instead of added to the queue if the view is already attached.
-
-## 1.0.0
-
-Project available
 
 # Community
 
