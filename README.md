@@ -17,6 +17,10 @@ compile 'com.github.mandriana:mvp-base-views-rx2:1.0.6'
 compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.0.6'
 ```
 
+# Wiki
+
+Refer to the [wiki](https://github.com/mandriana/android-mvp-core/wiki) for description.
+
 # Community
 
 Looking for contributors, feel free to fork !
