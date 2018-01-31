@@ -1,3 +1,8 @@
+## 1.0.7 
+
+Fixed pom publication in aar.
+Added missing annotation Nullable, NonNull ... (for better kotlin support).
+
 ## 1.0.6
 Upgraded dependencies.
 Added use of ConcurrentHashmap for observable cache in RxPresenter.

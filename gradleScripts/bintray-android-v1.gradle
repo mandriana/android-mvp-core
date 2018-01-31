@@ -59,7 +59,7 @@ publishing.publications {
     core(MavenPublication) {
         groupId project.ext.publishedGroupId
         artifactId = project.ext.artifact
-        version '1.0.6'
+        version project.ext.libraryVersion
 
         artifact "$buildDir/outputs/aar/${project.ext.artifact}-${version}-release.aar"
         artifact sourcesJar

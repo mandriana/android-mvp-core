@@ -14,7 +14,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.6"
+        versionName "1.0.7"
     }
     buildTypes {
         release {
@@ -27,10 +27,10 @@ android {
     flavorDimensions "default"
     productFlavors {
         dagger {
-            ext.flavorVersion = '1.0.6'
+            ext.flavorVersion = '1.0.7'
         }
         noDagger {
-            ext.flavorVersion = '1.0.6'
+            ext.flavorVersion = '1.0.7'
         }
     }
     defineOutputForAars(libraryVariants)
@@ -61,7 +61,7 @@ ext {
     publishedGroupId = 'com.github.mandriana'
     libraryName = 'MVP base views'
     artifact = 'mvp-base-views'
-    libraryVersion = '1.0.6'
+    libraryVersion = '1.0.7'
 
     libraryDescription = 'A set of base views to be used with mvp-core'
 
@@ -94,6 +94,6 @@ def defineOutputForAars(libraryVariants) {
     }
 }
 
-ext.flavorToBuild = "dagger"
+ext.flavorToBuild = "noDagger"
 
 apply from: rootProject.file('gradleScripts/bintray-flavors.gradle')

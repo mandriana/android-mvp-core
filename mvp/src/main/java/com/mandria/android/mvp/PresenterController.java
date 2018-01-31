@@ -120,7 +120,7 @@ public abstract class PresenterController<P extends Presenter> {
      * @param view View to attache.
      */
     @SuppressWarnings("unchecked")
-    public void attachViewToPresenter(Object view) {
+    public void attachViewToPresenter(@NonNull Object view) {
         boolean presenterCreated = mPresenter != null;
         getPresenter();
         if (mPresenter != null && !mPresenterHasView) {
