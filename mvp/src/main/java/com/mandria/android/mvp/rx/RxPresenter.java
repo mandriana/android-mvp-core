@@ -612,9 +612,8 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param withDefaultSchedulers True if default schedulers should be applied.
      * @param onError               OnError action to call
      * @param onCompleted           OnCompleted action to call
-     * @param <Result>              Result type of the completable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Completable completable, boolean withDefaultSchedulers,
+    public void start(@NonNull final String tag, @NonNull Completable completable, boolean withDefaultSchedulers,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
@@ -623,7 +622,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (!mCache.containsKey(tag)) {
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
-                completable = completable.compose(RxUtils.<Result>applyCompletableIOScheduler());
+                completable = completable.compose(RxUtils.applyCompletableIOScheduler());
             }
             cached = new CacheableStream<>(
                     completable,
@@ -661,7 +660,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError     OnError action to call
      * @param onCompleted OnCompleted action to call
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Completable completable, @Nullable final OnError<V> onError,
+    public void start(@NonNull final String tag, @NonNull Completable completable, @Nullable final OnError<V> onError,
             @Nullable final OnCompleted<V> onCompleted) {
         start(tag, completable, true, onError, onCompleted);
     }

@@ -8,7 +8,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.6"
+        versionName "1.0.7"
     }
     buildTypes {
         release {
@@ -17,6 +17,7 @@ android {
             consumerProguardFiles 'proguard-consumer.pro'
         }
     }
+    defineOutputForAars(libraryVariants)
 }
 
 dependencies {
@@ -39,7 +40,7 @@ ext {
     publishedGroupId = 'com.github.mandriana'
     libraryName = 'MVPCore'
     artifact = 'mvp-core-rx2'
-    libraryVersion = '1.0.6'
+    libraryVersion = '1.0.7'
 
     libraryDescription = 'A library to set up a mvp architecture on Android'
 
@@ -55,6 +56,21 @@ ext {
     allLicenses = ["Apache-2.0"]
 
     bintrayLabels = ['aar', 'android', 'architecture', 'MVP']
+}
+
+def getAarFileNameForVariant(variant) {
+    "${project.ext.artifact}-${version}-${variant.buildType.name}.aar"
+}
+
+def defineOutputForAars(libraryVariants) {
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (outputFileName != null && outputFileName.endsWith('.aar')) {
+                def fileName = getAarFileNameForVariant(variant)
+                outputFileName = new File(fileName)
+            }
+        }
+    }
 }
 
 apply from: rootProject.file('gradleScripts/install-v1.gradle')

@@ -1,6 +1,7 @@
 package com.mandria.android.mvp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
@@ -40,7 +41,7 @@ public abstract class Presenter<V> {
      *
      * @param state Presenter bundle state.
      */
-    protected void onSave(Bundle state) {
+    protected void onSave(@NonNull Bundle state) {
         MVPLogger.d(getClass().getSimpleName(), "On save presenter state");
     }
 
@@ -49,7 +50,7 @@ public abstract class Presenter<V> {
      *
      * @param view The view which is now attached.
      */
-    protected void onViewAttached(V view) {
+    protected void onViewAttached(@NonNull V view) {
         MVPLogger.d(getClass().getSimpleName(), String.format("View %s is attached to presenter", mView.getClass().getSimpleName()));
     }
 
@@ -91,7 +92,7 @@ public abstract class Presenter<V> {
      *
      * @param state Bundle to save state into.
      */
-    final void save(Bundle state) {
+    final void save(@NonNull Bundle state) {
         onSave(state);
     }
 
@@ -100,7 +101,7 @@ public abstract class Presenter<V> {
      *
      * @param view View to attach.
      */
-    final void attachView(V view) {
+    final void attachView(@NonNull V view) {
         mView = view;
         onViewAttached(view);
     }
