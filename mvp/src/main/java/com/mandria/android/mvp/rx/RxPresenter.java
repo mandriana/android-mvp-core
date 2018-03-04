@@ -138,7 +138,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * Cancels all running observables by unsubscribing to them
      * and clearing the cache.
      */
-    private void cancelAll() {
+    protected final void cancelAll() {
         if (mSubscriptions != null) {
             mSubscriptions.clear();
             mSubscriptions = new CompositeSubscription();
