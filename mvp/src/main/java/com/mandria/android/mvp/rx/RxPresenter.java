@@ -143,7 +143,7 @@ public class RxPresenter<V> extends Presenter<V> {
     /**
      * Cancels all running observables by disposing from them and clearing the cache.
      */
-    private void cancelAll() {
+    protected final void cancelAll() {
         if (mDisposables != null) {
             mDisposables.clear();
             mDisposables = new CompositeDisposable();

@@ -140,9 +140,11 @@ public abstract class PresenterController<P extends Presenter> {
      * @param destroy True if the {@link Presenter#destroy()} should be called..
      */
     public void detachViewFromPresenter(boolean destroy) {
-        if (mPresenter != null && mPresenterHasView) {
-            mPresenter.detachView();
-            mPresenterHasView = false;
+        if (mPresenter != null) {
+            if (mPresenterHasView) {
+                mPresenter.detachView();
+                mPresenterHasView = false;
+            }
             if (destroy) {
                 mPresenter.destroy();
                 mPresenterCache.removePresenter(mPresenter);

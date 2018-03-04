@@ -1,3 +1,7 @@
+## 1.0.8
+Fixed presenter destruction.
+"cancelAll" is now final and protected to be called in presenter.
+
 ## 1.0.7 
 
 Fixed pom publication in aar.
