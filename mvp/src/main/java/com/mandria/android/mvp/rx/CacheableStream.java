@@ -9,7 +9,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
 /**
@@ -24,42 +23,36 @@ class CacheableStream<View, Result> {
     /**
      * Constructor.
      *
-     * @param observable  Observable to cache.
-     * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the observable terminates.
-     * @param consumer    Consumer to attach to the observable.
+     * @param observable Observable to cache.
+     * @param view       Observable that emits the view.
+     * @param consumer   Consumer to attach to the observable.
      */
-    CacheableStream(Observable<Result> observable, Observable<RxView<View>> view, Action onTerminate,
-            Consumer<BoundData<View, Result>> consumer) {
-        mProxy = new ObservableSubscriptionProxy<>(observable, view, onTerminate);
+    CacheableStream(Observable<Result> observable, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+        mProxy = new ObservableSubscriptionProxy<>(observable, view);
         mConsumer = consumer;
     }
 
     /**
      * Constructor.
      *
-     * @param flowable    Flowable to cache.
-     * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the observable terminates.
-     * @param consumer    Consumer to attach to the observable.
+     * @param flowable Flowable to cache.
+     * @param view     Observable that emits the view.
+     * @param consumer Consumer to attach to the observable.
      */
-    CacheableStream(Flowable<Result> flowable, Observable<RxView<View>> view, Action onTerminate,
-            Consumer<BoundData<View, Result>> consumer) {
-        mProxy = new FlowableSubscriptionProxy<>(flowable, view, onTerminate);
+    CacheableStream(Flowable<Result> flowable, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+        mProxy = new FlowableSubscriptionProxy<>(flowable, view);
         mConsumer = consumer;
     }
 
     /**
      * Constructor.
      *
-     * @param single      Single to cache.
-     * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the observable terminates.
-     * @param consumer    Consumer to attach to the observable.
+     * @param single   Single to cache.
+     * @param view     Observable that emits the view.
+     * @param consumer Consumer to attach to the observable.
      */
-    CacheableStream(Single<Result> single, Observable<RxView<View>> view, Action onTerminate,
-            Consumer<BoundData<View, Result>> consumer) {
-        mProxy = new FlowableSubscriptionProxy<>(single.toFlowable(), view, onTerminate);
+    CacheableStream(Single<Result> single, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+        mProxy = new FlowableSubscriptionProxy<>(single.toFlowable(), view);
         mConsumer = consumer;
     }
 
@@ -68,26 +61,22 @@ class CacheableStream<View, Result> {
      *
      * @param completable Completable to cache.
      * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the observable terminates.
      * @param consumer    Consumer to attach to the observable.
      */
-    CacheableStream(Completable completable, Observable<RxView<View>> view, Action onTerminate,
-            Consumer<BoundData<View, Result>> consumer) {
-        mProxy = new ObservableSubscriptionProxy<>(completable.<Result>toObservable(), view, onTerminate);
+    CacheableStream(Completable completable, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+        mProxy = new ObservableSubscriptionProxy<>(completable.<Result>toObservable(), view);
         mConsumer = consumer;
     }
 
     /**
      * Constructor.
      *
-     * @param maybe       Maybe to cache.
-     * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the observable terminates.
-     * @param consumer    Consumer to attach to the observable.
+     * @param maybe    Maybe to cache.
+     * @param view     Observable that emits the view.
+     * @param consumer Consumer to attach to the observable.
      */
-    CacheableStream(Maybe<Result> maybe, Observable<RxView<View>> view, Action onTerminate,
-            Consumer<BoundData<View, Result>> consumer) {
-        mProxy = new ObservableSubscriptionProxy<>(maybe.toObservable(), view, onTerminate);
+    CacheableStream(Maybe<Result> maybe, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+        mProxy = new ObservableSubscriptionProxy<>(maybe.toObservable(), view);
         mConsumer = consumer;
     }
 

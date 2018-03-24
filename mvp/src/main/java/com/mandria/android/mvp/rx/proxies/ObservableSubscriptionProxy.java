@@ -1,14 +1,11 @@
 package com.mandria.android.mvp.rx.proxies;
 
-import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.rx.BoundData;
 import com.mandria.android.mvp.rx.RxView;
 
-import io.reactivex.Notification;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.subjects.ReplaySubject;
@@ -30,10 +27,9 @@ public class ObservableSubscriptionProxy<View, Result> extends AbstractSubscript
      *
      * @param observable  Original observable.
      * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the ReplaySubject will terminate.
      */
-    public ObservableSubscriptionProxy(Observable<Result> observable, Observable<RxView<View>> view, final Action onTerminate) {
-        super(onTerminate);
+    public ObservableSubscriptionProxy(Observable<Result> observable, Observable<RxView<View>> view) {
+        super();
 
         // Creates a replay subject which will subscribe to the observable.
         final ReplaySubject<Result> replaySubject = ReplaySubject.create();
@@ -63,20 +59,7 @@ public class ObservableSubscriptionProxy<View, Result> extends AbstractSubscript
                         view,
                         replaySubject.materialize(),
                         mCombineFunction)
-                .filter(mFilterPredicate)
-                .doAfterNext(new Consumer<BoundData<View, Result>>() {
-                    @Override
-                    public void accept(BoundData<View, Result> viewResultBoundData) throws Exception {
-                        Notification<Result> notification = viewResultBoundData.getData();
-                        if (notification.isOnComplete() || notification.isOnError()) {
-                            try {
-                                mOnTerminate.run();
-                            } catch (Exception e) {
-                                MVPLogger.e(mTag, e.getMessage());
-                            }
-                        }
-                    }
-                });
+                .filter(mFilterPredicate);
 
         // Adds the replaySubject subscription to the CompositeSubscription
         // to be able to dispose the replaySubject from the original observable

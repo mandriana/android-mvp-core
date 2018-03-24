@@ -94,6 +94,6 @@ def defineOutputForAars(libraryVariants) {
     }
 }
 
-ext.flavorToBuild = "noDagger"
+ext.flavorToBuild = "dagger"
 
 apply from: rootProject.file('gradleScripts/bintray-flavors.gradle')

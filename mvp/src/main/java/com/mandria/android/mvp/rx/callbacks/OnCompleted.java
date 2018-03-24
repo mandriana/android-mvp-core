@@ -1,5 +1,7 @@
 package com.mandria.android.mvp.rx.callbacks;
 
+import android.support.annotation.NonNull;
+
 import io.reactivex.functions.Consumer;
 
 /**
@@ -7,4 +9,6 @@ import io.reactivex.functions.Consumer;
  */
 public interface OnCompleted<U> extends Consumer<U> {
 
+    @Override
+    void accept(@NonNull U u) throws Exception;
 }

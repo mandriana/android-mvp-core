@@ -1,5 +1,6 @@
 ## 1.0.10
-onTerminate couldn't be used because notifications were observed. Instead use a doAfterNext and check isCompleted or isError.
+onTerminate couldn't be used because notifications were observed. Instead action is performed after view received callbacks.
+Added annotations on action callbacks signature for the non null view.
 
 ## 1.0.9
 Fixed the call of onTerminate action which was done after the original observable completion instead of the replay completion.

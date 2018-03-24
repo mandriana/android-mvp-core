@@ -27,7 +27,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -215,25 +214,6 @@ public class RxPresenter<V> extends Presenter<V> {
     }
 
     /**
-     * Gets the action to run on each {@link CacheableStream} to remove stream from cache or queue.
-     *
-     * @param tag Stream tag.
-     * @return The action to run.
-     */
-    private Action getCacheableOnTerminateAction(final String tag) {
-        return new Action() {
-            @Override
-            public void run() throws Exception {
-                if (mCacheSynchronization.getValue()) {
-                    mTerminatedQueue.add(tag);
-                } else {
-                    removeFromCache(tag);
-                }
-            }
-        };
-    }
-
-    /**
      * Gets a consumer for the stream which will dispatch events to each corresponding callback.
      *
      * @param onNext      OnNext action to call
@@ -242,7 +222,8 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param <Result>    Result type of the observable.
      * @return The consumer to attach to the stream.
      */
-    private <Result> Consumer<BoundData<V, Result>> getCacheableStreamConsumer(@Nullable final OnNext<V, Result> onNext,
+    private <Result> Consumer<BoundData<V, Result>> getCacheableStreamConsumer(@NonNull final String tag,
+            @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
         return new Consumer<BoundData<V, Result>>() {
             @Override
@@ -256,6 +237,14 @@ public class RxPresenter<V> extends Presenter<V> {
                     onCompleted.accept(view);
                 } else if (onError != null && notification.isOnError()) {
                     onError.accept(view, notification.getError());
+                }
+
+                if (notification.isOnComplete() || notification.isOnError()) {
+                    if (mCacheSynchronization.getValue()) {
+                        mTerminatedQueue.add(tag);
+                    } else {
+                        removeFromCache(tag);
+                    }
                 }
             }
         };
@@ -362,8 +351,7 @@ public class RxPresenter<V> extends Presenter<V> {
             cached = new CacheableStream<>(
                     observable,
                     mView,
-                    getCacheableOnTerminateAction(tag),
-                    getCacheableStreamConsumer(onNext, onError, onCompleted));
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
 
             if (!mCache.containsKey(tag)) {
                 mCache.put(tag, cached);
@@ -451,8 +439,7 @@ public class RxPresenter<V> extends Presenter<V> {
             cached = new CacheableStream<>(
                     flowable,
                     mView,
-                    getCacheableOnTerminateAction(tag),
-                    getCacheableStreamConsumer(onNext, onError, onCompleted));
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
 
             if (!mCache.containsKey(tag)) {
                 mCache.put(tag, cached);
@@ -540,8 +527,7 @@ public class RxPresenter<V> extends Presenter<V> {
             cached = new CacheableStream<>(
                     single,
                     mView,
-                    getCacheableOnTerminateAction(tag),
-                    getCacheableStreamConsumer(onNext, onError, onCompleted));
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
 
             if (!mCache.containsKey(tag)) {
                 mCache.put(tag, cached);
@@ -627,8 +613,7 @@ public class RxPresenter<V> extends Presenter<V> {
             cached = new CacheableStream<>(
                     completable,
                     mView,
-                    getCacheableOnTerminateAction(tag),
-                    getCacheableStreamConsumer(null, onError, onCompleted));
+                    getCacheableStreamConsumer(tag, null, onError, onCompleted));
 
             if (!mCache.containsKey(tag)) {
                 mCache.put(tag, cached);
@@ -700,8 +685,7 @@ public class RxPresenter<V> extends Presenter<V> {
             cached = new CacheableStream<>(
                     maybe,
                     mView,
-                    getCacheableOnTerminateAction(tag),
-                    getCacheableStreamConsumer(onNext, onError, onCompleted));
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
 
             if (!mCache.containsKey(tag)) {
                 mCache.put(tag, cached);
