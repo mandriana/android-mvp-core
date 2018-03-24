@@ -43,15 +43,7 @@ class SubscriptionProxy<View, Result> {
         mObservable = Observable
                 .combineLatest(
                         view,
-                        replaySubject.materialize().doAfterTerminate(new Action0() {
-                            @Override
-                            public void call() {
-                                // This method is called after termination consumption
-                                // we can remove unsubscribe all
-                                mSubscriptionList.unsubscribe();
-                                onTerminate.call();
-                            }
-                        }),
+                        replaySubject.materialize(),
                         new Func2<View, Notification<Result>, BoundData<View, Result>>() {
                             @Override
                             public BoundData<View, Result> call(View v, Notification<Result> replayNotification) {
@@ -72,6 +64,14 @@ class SubscriptionProxy<View, Result> {
                     @Override
                     public Boolean call(BoundData<View, Result> vtBoundData) {
                         return vtBoundData != null;
+                    }
+                }).doAfterTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        // This method is called after termination consumption
+                        // we can remove unsubscribe all
+                        mSubscriptionList.unsubscribe();
+                        onTerminate.call();
                     }
                 });
 
