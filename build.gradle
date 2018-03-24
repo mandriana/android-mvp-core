@@ -50,5 +50,5 @@ ext {
 
     // MVP
     mvp_core = '1.0.10'
-    mvp_views = '1.0.9'
+    mvp_views = '1.0.10'
 }
