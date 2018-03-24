@@ -1,10 +1,12 @@
 package com.mandria.android.mvp.rx.proxies;
 
+import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.rx.BoundData;
 import com.mandria.android.mvp.rx.RxView;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Notification;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -18,6 +20,8 @@ import io.reactivex.subscribers.DisposableSubscriber;
  * A {@link ReplayProcessor} subscribes to the flowable and is used to attach the {@link Consumer}.
  */
 public class FlowableSubscriptionProxy<View, Result> extends AbstractSubscriptionProxy<View, Result> {
+
+    private final String mTag = getClass().getSimpleName();
 
     private final DisposableSubscriber<Result> mReplayDisposable;
 
@@ -64,7 +68,19 @@ public class FlowableSubscriptionProxy<View, Result> extends AbstractSubscriptio
                         mCombineFunction
                 )
                 .filter(mFilterPredicate)
-                .doAfterTerminate(mOnTerminate);
+                .doAfterNext(new Consumer<BoundData<View, Result>>() {
+                    @Override
+                    public void accept(BoundData<View, Result> viewResultBoundData) throws Exception {
+                        Notification<Result> notification = viewResultBoundData.getData();
+                        if (notification.isOnComplete() || notification.isOnError()) {
+                            try {
+                                mOnTerminate.run();
+                            } catch (Exception e) {
+                                MVPLogger.e(mTag, e.getMessage());
+                            }
+                        }
+                    }
+                });
 
         // Adds the replaySubject subscription to the CompositeSubscription
         // to be able to dispose the replaySubject from the original flowable

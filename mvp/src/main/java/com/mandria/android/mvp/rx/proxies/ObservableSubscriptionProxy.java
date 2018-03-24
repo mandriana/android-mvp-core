@@ -1,8 +1,10 @@
 package com.mandria.android.mvp.rx.proxies;
 
+import com.mandria.android.mvp.MVPLogger;
 import com.mandria.android.mvp.rx.BoundData;
 import com.mandria.android.mvp.rx.RxView;
 
+import io.reactivex.Notification;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -16,6 +18,8 @@ import io.reactivex.subjects.ReplaySubject;
  * A {@link ReplaySubject} subscribes to the observable and is used to attach the {@link Consumer}.
  */
 public class ObservableSubscriptionProxy<View, Result> extends AbstractSubscriptionProxy<View, Result> {
+
+    private final String mTag = getClass().getSimpleName();
 
     private final DisposableObserver<Result> mReplayDisposable;
 
@@ -60,7 +64,19 @@ public class ObservableSubscriptionProxy<View, Result> extends AbstractSubscript
                         replaySubject.materialize(),
                         mCombineFunction)
                 .filter(mFilterPredicate)
-                .doAfterTerminate(mOnTerminate);
+                .doAfterNext(new Consumer<BoundData<View, Result>>() {
+                    @Override
+                    public void accept(BoundData<View, Result> viewResultBoundData) throws Exception {
+                        Notification<Result> notification = viewResultBoundData.getData();
+                        if (notification.isOnComplete() || notification.isOnError()) {
+                            try {
+                                mOnTerminate.run();
+                            } catch (Exception e) {
+                                MVPLogger.e(mTag, e.getMessage());
+                            }
+                        }
+                    }
+                });
 
         // Adds the replaySubject subscription to the CompositeSubscription
         // to be able to dispose the replaySubject from the original observable

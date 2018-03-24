@@ -1,3 +1,6 @@
+## 1.0.10
+onTerminate couldn't be used because notifications were observed. Instead use a doAfterNext and check isCompleted or isError.
+
 ## 1.0.9
 Fixed the call of onTerminate action which was done after the original observable completion instead of the replay completion.
 This caused the isCompleted notification never be retrieved if received while view was not available.
