@@ -1,3 +1,7 @@
+## 1.0.9
+Fixed the call of onTerminate action which was done after the original observable completion instead of the replay completion.
+This caused the isCompleted notification never be retrieved if received while view was not available.
+
 ## 1.0.8
 Fixed presenter destruction.
 "cancelAll" is now final and protected to be called in presenter.

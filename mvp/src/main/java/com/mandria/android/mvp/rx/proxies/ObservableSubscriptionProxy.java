@@ -57,9 +57,10 @@ public class ObservableSubscriptionProxy<View, Result> extends AbstractSubscript
         mObservable = Observable
                 .combineLatest(
                         view,
-                        replaySubject.materialize().doAfterTerminate(mOnTerminate),
+                        replaySubject.materialize(),
                         mCombineFunction)
-                .filter(mFilterPredicate);
+                .filter(mFilterPredicate)
+                .doAfterTerminate(mOnTerminate);
 
         // Adds the replaySubject subscription to the CompositeSubscription
         // to be able to dispose the replaySubject from the original observable
