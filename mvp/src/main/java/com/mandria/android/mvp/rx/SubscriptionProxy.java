@@ -3,7 +3,6 @@ package com.mandria.android.mvp.rx;
 import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -30,9 +29,8 @@ class SubscriptionProxy<View, Result> {
      *
      * @param observable  Original observable.
      * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the ReplaySubject will terminate.
      */
-    SubscriptionProxy(Observable<Result> observable, Observable<View> view, final Action0 onTerminate) {
+    SubscriptionProxy(Observable<Result> observable, Observable<View> view) {
         // Creates a replay subject which will subscribe to the observable.
         ReplaySubject<Result> replaySubject = ReplaySubject.create();
         mReplaySubscription = observable.subscribe(replaySubject);
@@ -64,14 +62,6 @@ class SubscriptionProxy<View, Result> {
                     @Override
                     public Boolean call(BoundData<View, Result> vtBoundData) {
                         return vtBoundData != null;
-                    }
-                }).doAfterTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        // This method is called after termination consumption
-                        // we can remove unsubscribe all
-                        mSubscriptionList.unsubscribe();
-                        onTerminate.call();
                     }
                 });
 

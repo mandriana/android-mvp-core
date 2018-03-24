@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import rx.Notification;
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;
 import rx.subscriptions.CompositeSubscription;
@@ -244,16 +243,6 @@ public class RxPresenter<V> extends Presenter<V> {
             cached = new CacheableObservable<>(
                     observable,
                     mView,
-                    new Action0() {
-                        @Override
-                        public void call() {
-                            if (mCacheSynchronization.getValue()) {
-                                mTerminatedQueue.add(tag);
-                            } else {
-                                removeFromCache(tag);
-                            }
-                        }
-                    },
                     new Action1<BoundData<V, Result>>() {
                         @Override
                         public void call(BoundData<V, Result> vResultBoundData) {
@@ -266,6 +255,16 @@ public class RxPresenter<V> extends Presenter<V> {
                                 onCompleted.call(view);
                             } else if (onError != null && notification.isOnError()) {
                                 onError.call(view, notification.getThrowable());
+                            }
+
+                            if (notification.isOnCompleted() || notification.isOnError()) {
+                                // Previous onTerminate action is executed here because at this point the view
+                                // had received the notification, no need to deal with backpressure
+                                if (mCacheSynchronization.getValue()) {
+                                    mTerminatedQueue.add(tag);
+                                } else {
+                                    removeFromCache(tag);
+                                }
                             }
                         }
                     });

@@ -1,5 +1,7 @@
 package com.mandria.android.mvp.rx.callbacks;
 
+import android.support.annotation.NonNull;
+
 import rx.functions.Action2;
 
 /**
@@ -7,4 +9,6 @@ import rx.functions.Action2;
  */
 public interface OnNext<U, V> extends Action2<U, V> {
 
+    @Override
+    void call(@NonNull U u, V v);
 }

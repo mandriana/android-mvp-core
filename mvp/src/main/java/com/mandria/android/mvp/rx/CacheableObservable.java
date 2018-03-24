@@ -1,7 +1,6 @@
 package com.mandria.android.mvp.rx;
 
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**
@@ -18,12 +17,11 @@ class CacheableObservable<View, Result> {
      *
      * @param observable  Observable to cache.
      * @param view        Observable that emits the view.
-     * @param onTerminate Action to perform when the observable terminates.
      * @param subscriber  Subscriber to attach to the observable.
      */
-    CacheableObservable(Observable<Result> observable, Observable<View> view, Action0 onTerminate,
+    CacheableObservable(Observable<Result> observable, Observable<View> view,
             Action1<BoundData<View, Result>> subscriber) {
-        mProxy = new SubscriptionProxy<>(observable, view, onTerminate);
+        mProxy = new SubscriptionProxy<>(observable, view);
         mSubscriber = subscriber;
     }
 
