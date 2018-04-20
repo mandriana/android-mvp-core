@@ -24,6 +24,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.ReplaySubject;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -34,9 +35,9 @@ public class RxPresenter<V> extends Presenter<V> {
     private final String mTag = getClass().getSimpleName();
 
     /**
-     * Behavior subject to fire the cache removal off all awaiting task.
+     * Replay subject to fire the cache removal off all awaiting task.
      */
-    private final BehaviorSubject<Boolean> mCacheSynchronization = BehaviorSubject.create();
+    private final ReplaySubject<Boolean> mCacheSynchronization = ReplaySubject.create();
 
     /**
      * Queue to store the observable tags which have terminated while manipulating the cache.
@@ -71,6 +72,10 @@ public class RxPresenter<V> extends Presenter<V> {
         super.onCreate(savedState);
 
         mSubscriptions = new CompositeSubscription();
+
+        // The replay subject must be initialized when presenter is created
+        mCacheSynchronization.onNext(false);
+
         mCacheSynchronization.subscribe(new Action1<Boolean>() {
             @Override
             public void call(Boolean manipulating) {
@@ -88,7 +93,7 @@ public class RxPresenter<V> extends Presenter<V> {
 
     @CallSuper
     @Override
-    protected void onViewAttached(V view) {
+    protected void onViewAttached(@NonNull V view) {
         super.onViewAttached(view);
 
         mView.onNext(view);
@@ -111,8 +116,8 @@ public class RxPresenter<V> extends Presenter<V> {
         super.onDestroy();
 
         mView.onCompleted();
-        mCacheSynchronization.onCompleted();
         cancelAll();
+        mCacheSynchronization.onCompleted();
     }
 
     /**

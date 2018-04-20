@@ -1,3 +1,7 @@
+## 1.0.11
+Fixed the cache synchronization subject by using a replay subject instead.
+The getValue() of the BehaviorSubject was returning null in some cases 
+
 ## 1.0.10
 onTerminate couldn't be used because notifications were observed. Instead action is performed after view received callbacks.
 Added annotations on action callbacks signature for the non null view.
@@ -11,7 +15,6 @@ Fixed presenter destruction.
 "cancelAll" is now final and protected to be called in presenter.
 
 ## 1.0.7 
-
 Fixed pom publication in aar.
 Added missing annotation Nullable, NonNull ... (for better kotlin support).
 
@@ -20,29 +23,23 @@ Upgraded dependencies.
 Added use of ConcurrentHashmap for observable cache in RxPresenter.
 
 ## 1.0.5 (mvp-base-views with and without dagger)
-
 Fixed presenter lifecycle in onPause, onDestroy and finish.
 
 ## 1.0.4
-
 Added logs and ability to activate/deactivate them.
 
 ## 1.0.3
-
 Upgraded dependencies versions.
 Fixed a bug when retrieving a presenter from the cache when multiple views with presenters were created in a very short time.
 
 ## 1.0.2
-
 startOnViewAttached now accepts an Action1 to provide the view as action parameter.
 Upgraded dependencies versions.
 
 ## 1.0.1
-
 Fixed the startOnViewAttached method so that the action is started instead of added to the queue if the view is already attached.
 
 ## 1.0.0
-
 Project available
 
 License
