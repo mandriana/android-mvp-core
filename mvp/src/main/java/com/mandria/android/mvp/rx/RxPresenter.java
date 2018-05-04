@@ -233,10 +233,11 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param <Result>    Result type of the observable.
      * @return The consumer to attach to the stream.
      */
-    private <Result> Consumer<BoundData<V, Result>> getCacheableStreamConsumer(@NonNull final String tag,
+    private <Result> MVPConsumer<V, Result> getCacheableStreamConsumer(@NonNull final String tag,
             @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
-        return new Consumer<BoundData<V, Result>>() {
+        return new MVPConsumer<V, Result>(onNext, onError, onCompleted) {
+
             @Override
             public void accept(@io.reactivex.annotations.NonNull BoundData<V, Result> rxViewResultBoundData) throws Exception {
                 V view = rxViewResultBoundData.getView();
@@ -348,7 +349,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted           OnCompleted action to call
      * @param <Result>              Result type of the observable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Observable<Result> observable, boolean withDefaultSchedulers,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Observable<Result> observable, boolean withDefaultSchedulers,
             @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
@@ -378,6 +379,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (cached != null) {
             cached.resume();
         }
+        return cached;
     }
 
     /**
@@ -396,9 +398,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted OnCompleted action to call
      * @param <Result>    Result type of the observable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Observable<Result> observable, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Observable<Result> observable, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
-        start(tag, observable, true, onNext, onError, onCompleted);
+        return start(tag, observable, true, onNext, onError, onCompleted);
     }
 
     /**
@@ -410,9 +412,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError    OnError action to call
      * @param <Result>   Result type of the observable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Observable<Result> observable, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Observable<Result> observable, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError) {
-        start(tag, observable, onNext, onError, null);
+        return start(tag, observable, onNext, onError, null);
     }
 
     /**
@@ -436,7 +438,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted           OnCompleted action to call
      * @param <Result>              Result type of the flowable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Flowable<Result> flowable, boolean withDefaultSchedulers,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Flowable<Result> flowable, boolean withDefaultSchedulers,
             @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
@@ -466,6 +468,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (cached != null) {
             cached.resume();
         }
+        return cached;
     }
 
     /**
@@ -484,9 +487,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted OnCompleted action to call
      * @param <Result>    Result type of the flowable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Flowable<Result> flowable, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Flowable<Result> flowable, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
-        start(tag, flowable, true, onNext, onError, onCompleted);
+        return start(tag, flowable, true, onNext, onError, onCompleted);
     }
 
     /**
@@ -498,9 +501,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError  OnError action to call
      * @param <Result> Result type of the flowable.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Flowable<Result> flowable, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Flowable<Result> flowable, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError) {
-        start(tag, flowable, onNext, onError, null);
+        return start(tag, flowable, onNext, onError, null);
     }
 
     /**
@@ -524,7 +527,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted           OnCompleted action to call
      * @param <Result>              Result type of the single.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Single<Result> single, boolean withDefaultSchedulers,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Single<Result> single, boolean withDefaultSchedulers,
             @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
@@ -554,6 +557,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (cached != null) {
             cached.resume();
         }
+        return cached;
     }
 
     /**
@@ -572,9 +576,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted OnCompleted action to call
      * @param <Result>    Result type of the single.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Single<Result> single, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Single<Result> single, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
-        start(tag, single, true, onNext, onError, onCompleted);
+        return start(tag, single, true, onNext, onError, onCompleted);
     }
 
     /**
@@ -586,9 +590,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError  OnError action to call
      * @param <Result> Result type of the single.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Single<Result> single, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Single<Result> single, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError) {
-        start(tag, single, onNext, onError, null);
+       return start(tag, single, onNext, onError, null);
     }
 
     /**
@@ -610,7 +614,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError               OnError action to call
      * @param onCompleted           OnCompleted action to call
      */
-    public void start(@NonNull final String tag, @NonNull Completable completable, boolean withDefaultSchedulers,
+    public CacheableStream<V, Object> start(@NonNull final String tag, @NonNull Completable completable, boolean withDefaultSchedulers,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
@@ -640,6 +644,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (cached != null) {
             cached.resume();
         }
+        return cached;
     }
 
     /**
@@ -656,9 +661,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError     OnError action to call
      * @param onCompleted OnCompleted action to call
      */
-    public void start(@NonNull final String tag, @NonNull Completable completable, @Nullable final OnError<V> onError,
+    public CacheableStream<V, Object>  start(@NonNull final String tag, @NonNull Completable completable, @Nullable final OnError<V> onError,
             @Nullable final OnCompleted<V> onCompleted) {
-        start(tag, completable, true, onError, onCompleted);
+        return start(tag, completable, true, onError, onCompleted);
     }
 
     /**
@@ -682,7 +687,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted           OnCompleted action to call
      * @param <Result>              Result type of the maybe.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Maybe<Result> maybe, boolean withDefaultSchedulers,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Maybe<Result> maybe, boolean withDefaultSchedulers,
             @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
@@ -712,6 +717,7 @@ public class RxPresenter<V> extends Presenter<V> {
         if (cached != null) {
             cached.resume();
         }
+        return cached;
     }
 
     /**
@@ -730,9 +736,9 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onCompleted OnCompleted action to call
      * @param <Result>    Result type of the maybe.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Maybe<Result> maybe, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Maybe<Result> maybe, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
-        start(tag, maybe, true, onNext, onError, onCompleted);
+        return start(tag, maybe, true, onNext, onError, onCompleted);
     }
 
     /**
@@ -744,8 +750,8 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param onError  OnError action to call
      * @param <Result> Result type of the maybe.
      */
-    public <Result> void start(@NonNull final String tag, @NonNull Maybe<Result> maybe, @Nullable final OnNext<V, Result> onNext,
+    public <Result> CacheableStream<V, Result> start(@NonNull final String tag, @NonNull Maybe<Result> maybe, @Nullable final OnNext<V, Result> onNext,
             @Nullable final OnError<V> onError) {
-        start(tag, maybe, onNext, onError, null);
+        return start(tag, maybe, onNext, onError, null);
     }
 }

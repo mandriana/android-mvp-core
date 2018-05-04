@@ -14,11 +14,11 @@ import io.reactivex.functions.Consumer;
 /**
  * This class is used to cache a stream with its subscriber.
  */
-class CacheableStream<View, Result> {
+public class CacheableStream<View, Result> {
 
     private AbstractSubscriptionProxy<View, Result> mProxy;
 
-    private Consumer<BoundData<View, Result>> mConsumer;
+    private MVPConsumer<View, Result> mConsumer;
 
     /**
      * Constructor.
@@ -27,7 +27,7 @@ class CacheableStream<View, Result> {
      * @param view       Observable that emits the view.
      * @param consumer   Consumer to attach to the observable.
      */
-    CacheableStream(Observable<Result> observable, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+    CacheableStream(Observable<Result> observable, Observable<RxView<View>> view, MVPConsumer<View, Result> consumer) {
         mProxy = new ObservableSubscriptionProxy<>(observable, view);
         mConsumer = consumer;
     }
@@ -39,7 +39,7 @@ class CacheableStream<View, Result> {
      * @param view     Observable that emits the view.
      * @param consumer Consumer to attach to the observable.
      */
-    CacheableStream(Flowable<Result> flowable, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+    CacheableStream(Flowable<Result> flowable, Observable<RxView<View>> view, MVPConsumer<View, Result> consumer) {
         mProxy = new FlowableSubscriptionProxy<>(flowable, view);
         mConsumer = consumer;
     }
@@ -51,7 +51,7 @@ class CacheableStream<View, Result> {
      * @param view     Observable that emits the view.
      * @param consumer Consumer to attach to the observable.
      */
-    CacheableStream(Single<Result> single, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+    CacheableStream(Single<Result> single, Observable<RxView<View>> view, MVPConsumer<View, Result> consumer) {
         mProxy = new FlowableSubscriptionProxy<>(single.toFlowable(), view);
         mConsumer = consumer;
     }
@@ -63,7 +63,7 @@ class CacheableStream<View, Result> {
      * @param view        Observable that emits the view.
      * @param consumer    Consumer to attach to the observable.
      */
-    CacheableStream(Completable completable, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+    CacheableStream(Completable completable, Observable<RxView<View>> view, MVPConsumer<View, Result> consumer) {
         mProxy = new ObservableSubscriptionProxy<>(completable.<Result>toObservable(), view);
         mConsumer = consumer;
     }
@@ -75,7 +75,7 @@ class CacheableStream<View, Result> {
      * @param view     Observable that emits the view.
      * @param consumer Consumer to attach to the observable.
      */
-    CacheableStream(Maybe<Result> maybe, Observable<RxView<View>> view, Consumer<BoundData<View, Result>> consumer) {
+    CacheableStream(Maybe<Result> maybe, Observable<RxView<View>> view, MVPConsumer<View, Result> consumer) {
         mProxy = new ObservableSubscriptionProxy<>(maybe.toObservable(), view);
         mConsumer = consumer;
     }
@@ -99,5 +99,15 @@ class CacheableStream<View, Result> {
      */
     void cancel() {
         mProxy.cancel();
+    }
+
+    /**
+     * Test method is used only to return the consumer and offer the possibility to trigger
+     * callbacks
+     * @return the consumer
+     */
+    public MVPConsumer<View,Result> test() {
+        cancel();
+        return mConsumer;
     }
 }
