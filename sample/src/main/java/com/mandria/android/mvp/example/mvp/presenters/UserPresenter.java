@@ -11,21 +11,29 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Created by michael on 19/04/2017.
  */
-public class MainPresenter extends RxPresenter<MainView> {
+public class UserPresenter extends RxPresenter<MainView> {
 
-    private static final String TAG = "MainPresenter";
+    private static final String TAG = "UserPresenter";
 
     private static final String TASK_DO_STUFF = "doStuff";
 
     private final TaskManager mTaskManager;
 
+    private final String mString;
+
     @Inject
-    public MainPresenter(TaskManager taskManager) {
+    public UserPresenter(TaskManager taskManager, @Named("testString") String test) {
         mTaskManager = taskManager;
+        mString = test;
+    }
+
+    public String getString() {
+        return mString;
     }
 
     public void doStuff() {

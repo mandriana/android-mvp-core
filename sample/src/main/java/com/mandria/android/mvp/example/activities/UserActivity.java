@@ -2,13 +2,12 @@ package com.mandria.android.mvp.example.activities;
 
 import com.mandria.android.mvp.PresenterClass;
 import com.mandria.android.mvp.basecompatviews.BasePresenterActivity;
-import com.mandria.android.mvp.example.MVPApplication;
 import com.mandria.android.mvp.example.R;
-import com.mandria.android.mvp.example.mvp.presenters.MainPresenter;
+import com.mandria.android.mvp.example.mvp.presenters.UserPresenter;
 import com.mandria.android.mvp.example.mvp.views.MainView;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,8 +16,8 @@ import dagger.android.AndroidInjection;
 /**
  * Created by michael on 13/04/2017.
  */
-@PresenterClass(MainPresenter.class)
-public class MainActivity extends BasePresenterActivity<MainPresenter> implements MainView {
+@PresenterClass(UserPresenter.class)
+public class UserActivity extends BasePresenterActivity<UserPresenter> implements MainView {
 
     private TextView mResultTextView;
 
@@ -38,13 +37,13 @@ public class MainActivity extends BasePresenterActivity<MainPresenter> implement
                 getPresenter().doStuff();
             }
         });
+
+        Log.i("-----", getPresenter().getString());
     }
 
     @Override
     public void onTaskSuccess(String result) {
         mResultTextView.setText(result);
-        MVPApplication.makeUserComponent();
-        startActivity(new Intent(this, UserActivity.class));
     }
 
     @Override

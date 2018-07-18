@@ -48,6 +48,9 @@ dependencies {
     implementation project(':mvp_compat_views')
 
     annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$rootProject.ext.dagger"
+    implementation "com.google.dagger:dagger-android:$rootProject.ext.dagger"
+    implementation "com.google.dagger:dagger-android-support:$rootProject.ext.dagger"
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
