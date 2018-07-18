@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Mvp library
     debugImplementation project(':mvp')
@@ -49,9 +49,9 @@ dependencies {
     // Dagger 2
     daggerApi "com.google.dagger:dagger:$rootProject.ext.dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
-    daggerProvided 'javax.annotation:jsr250-api:1.0'
+    daggerCompileOnly 'javax.annotation:jsr250-api:1.0'
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
 
 ext {

@@ -6,13 +6,13 @@ import java.util.HashMap;
  * <p>A cache for the presenter.</p>
  * <p>This class should be a singleton or used with a dependency injector to be injected as an application singleton.</p>
  */
-public class PresenterCache {
+public final class PresenterCache {
 
     private static final String TAG = "PresenterCache";
 
-    private HashMap<String, Presenter> mIdToPresenter = new HashMap<>();
+    private HashMap<String, Presenter> mIdToPresenter;
 
-    private HashMap<Presenter, String> mPresenterToId = new HashMap<>();
+    private HashMap<Presenter, String> mPresenterToId;
 
     /**
      * Constructor.

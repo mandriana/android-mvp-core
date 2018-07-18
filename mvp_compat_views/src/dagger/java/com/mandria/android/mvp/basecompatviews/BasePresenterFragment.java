@@ -3,8 +3,8 @@ package com.mandria.android.mvp.basecompatviews;
 
 import com.mandria.android.mvp.HasPresenter;
 import com.mandria.android.mvp.Presenter;
-import com.mandria.android.mvp.PresenterCache;
 import com.mandria.android.mvp.PresenterController;
+import com.mandria.android.mvp.PresenterProvider;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,63 +19,49 @@ import javax.inject.Inject;
 public abstract class BasePresenterFragment<P extends Presenter> extends Fragment implements HasPresenter<P> {
 
     /**
-     * A controller class to handle lifecycle with presenters.
+     * A provider class to handle lifecycle with presenters.
      */
-    private PresenterController<P> mPresenterController;
-
-    /**
-     * Presenter cache.
-     * It will be injected using the setter injector.
-     */
-    private PresenterCache mPresenterCache;
+    @Inject
+    PresenterProvider mPresenterProvider;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inject this fragment first because BasePresenterFragment need the presenter cache in its onCreate
-        injectFragment();
-
-        mPresenterController = new PresenterController<P>(getPresenterCache()) {
-            @NonNull
-            @Override
-            public P instantiatePresenter() {
-                return BasePresenterFragment.this.instantiatePresenter();
-            }
-        };
-
         if (savedInstanceState != null) {
-            mPresenterController.onRestoreInstanceState(savedInstanceState.getBundle(PresenterController.CONTROLLER_STATE_KEY));
+            mPresenterProvider.onRestoreInstanceState(savedInstanceState.getBundle(PresenterController.CONTROLLER_STATE_KEY));
         }
+
+        mPresenterProvider.preparePresenter(this);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle(PresenterController.CONTROLLER_STATE_KEY, mPresenterController.onSaveInstanceState());
+        outState.putBundle(PresenterProvider.CONTROLLER_STATE_KEY, mPresenterProvider.onSaveInstanceState());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenterController.attachViewToPresenter(this);
+        mPresenterProvider.attachViewToPresenter(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPresenterController.detachViewFromPresenter(false);
+        mPresenterProvider.detachViewFromPresenter(false);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mPresenterController.detachViewFromPresenter(!getActivity().isChangingConfigurations());
+        mPresenterProvider.detachViewFromPresenter(!getActivity().isChangingConfigurations());
     }
 
     @Override
     public P getPresenter() {
-        return mPresenterController.getPresenter();
+        return mPresenterProvider.getPresenter();
     }
 
     /**
@@ -84,38 +70,6 @@ public abstract class BasePresenterFragment<P extends Presenter> extends Fragmen
      * - presenter will be removed from the cache
      */
     public void destroyPresenter() {
-        mPresenterController.destroy();
+        mPresenterProvider.destroy();
     }
-
-    /**
-     * Injects the presenter cache when child class will inject the activity using {@link #injectFragment()} ()}.
-     *
-     * @param presenterCache Presenter cache injected.
-     */
-    @Inject
-    public void setPresenterCache(PresenterCache presenterCache) {
-        mPresenterCache = presenterCache;
-    }
-
-    /**
-     * Gets the presenter cache.
-     *
-     * @return Presenter cache.
-     */
-    protected PresenterCache getPresenterCache() {
-        return mPresenterCache;
-    }
-
-    /**
-     * Injects the fragment using the a component.
-     */
-    protected abstract void injectFragment();
-
-    /**
-     * This method should return a Presenter instance which will be used for the current view.
-     *
-     * @return A presenter instance.
-     */
-    @NonNull
-    protected abstract P instantiatePresenter();
 }
