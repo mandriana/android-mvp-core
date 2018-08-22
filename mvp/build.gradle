@@ -1,39 +1,5 @@
 apply plugin: 'com.android.library'
 
-android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-
-    defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles 'proguard-rules.pro'
-            consumerProguardFiles 'proguard-consumer.pro'
-        }
-    }
-    defineOutputForAars(libraryVariants)
-}
-
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    api "com.android.support:support-annotations:$rootProject.ext.supportLibraryVersion"
-
-    // Rx
-    api "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rx2AndroidVersion"
-    // Because RxAndroid releases are few and far between, it is recommended you also
-    // explicitly depend on RxJava's latest version for bug fixes and new features.
-    api "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava2"
-
-    testImplementation 'junit:junit:4.12'
-}
-
 ext {
     bintrayRepo = 'maven'
     bintrayName = 'mvp-core-rx2'
@@ -42,7 +8,7 @@ ext {
     publishedGroupId = 'com.github.mandriana'
     libraryName = 'MVPCore'
     artifact = 'mvp-core-rx2'
-    libraryVersion = '1.1.0'
+    libraryVersion = '2.0.0'
 
     libraryDescription = 'A library to set up a mvp architecture on Android'
 
@@ -58,6 +24,40 @@ ext {
     allLicenses = ["Apache-2.0"]
 
     bintrayLabels = ['aar', 'android', 'architecture', 'MVP']
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName project.ext.libraryVersion
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer.pro'
+        }
+    }
+    defineOutputForAars(libraryVariants)
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    api "androidx.annotation:annotation:$rootProject.ext.supportLibraryVersion"
+
+    // Rx
+    api "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rx2AndroidVersion"
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    api "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava2"
+
+    testImplementation 'junit:junit:4.12'
 }
 
 def getAarFileNameForVariant(variant) {

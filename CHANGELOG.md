@@ -1,3 +1,6 @@
+## 2.0.0
+Migrated to androidx.
+
 ## 1.1.0
 Created a presenter provider and presenter factory to allow constructor injected presenter when using base views with dagger.
 

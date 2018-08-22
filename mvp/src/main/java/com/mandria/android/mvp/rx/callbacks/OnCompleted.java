@@ -1,7 +1,6 @@
 package com.mandria.android.mvp.rx.callbacks;
 
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import io.reactivex.functions.Consumer;
 
 /**

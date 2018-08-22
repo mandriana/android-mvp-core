@@ -1,14 +1,15 @@
 package com.mandria.android.mvp.provider;
 
+import android.os.Bundle;
+
 import com.mandria.android.mvp.HasPresenter;
 import com.mandria.android.mvp.Presenter;
 import com.mandria.android.mvp.PresenterCache;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * This class is responsible of the presenter lifecycle and presenter provision.

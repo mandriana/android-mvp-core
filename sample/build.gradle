@@ -42,7 +42,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.supportLibraryVersion"
 
     implementation project(':mvp')
     implementation project(':mvp_compat_views')

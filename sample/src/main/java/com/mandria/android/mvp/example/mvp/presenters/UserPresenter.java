@@ -1,5 +1,7 @@
 package com.mandria.android.mvp.example.mvp.presenters;
 
+import android.util.Log;
+
 import com.mandria.android.mvp.example.managers.TaskManager;
 import com.mandria.android.mvp.example.mvp.views.MainView;
 import com.mandria.android.mvp.rx.RxPresenter;
@@ -7,11 +9,10 @@ import com.mandria.android.mvp.rx.callbacks.OnCompleted;
 import com.mandria.android.mvp.rx.callbacks.OnError;
 import com.mandria.android.mvp.rx.callbacks.OnNext;
 
-import android.support.annotation.NonNull;
-import android.util.Log;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by michael on 19/04/2017.

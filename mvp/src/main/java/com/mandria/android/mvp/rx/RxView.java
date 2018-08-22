@@ -1,6 +1,6 @@
 package com.mandria.android.mvp.rx;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * A view wrapper class to handle view which is nullable.

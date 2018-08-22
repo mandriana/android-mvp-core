@@ -10,11 +10,11 @@ This version supports RxJava 2.
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core-rx2:1.1.0'
+compile 'com.github.mandriana:mvp-core-rx2:2.0.0'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views-rx2:1.1.0'
+compile 'com.github.mandriana:mvp-base-views-rx2:2.0.0'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
+compile 'com.github.mandriana:mvp-base-views-rx2-dagger:2.0.0'
 ```
 
 # Wiki
@@ -32,11 +32,11 @@ Tell me if you're using my library in your application, I'll share it in this RE
 - mvp-core :
   - android support annotations
   - io.reactivex:rxandroid
-  -io.reactivex:rxjava
+  - io.reactivex:rxjava
 - mvp-base-views :
-  - android support appcompat-v7
+  - androidx appcompat-v7
 - mvp-base-views-dagger
-  - android support appcompat-v7
+  - androidx appcompat-v7
   - dagger 2
   
 # Credits

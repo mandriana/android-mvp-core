@@ -1,7 +1,8 @@
 package com.mandria.android.mvp;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 /**
  * A controller to manage presenter lifecycle.
