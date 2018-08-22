@@ -4,6 +4,10 @@ MVP Core is an Android Library which will help you to set up a MVP architecture 
 - task continuation through orientation change, application paused with result notification to your view as soon as the view is available
 - task cancellation
 
+# DEPRECATED
+
+This version of the library using RxJava 1 is no longer maintained. If you still use RxJava 1 I recommend you to migrate to RxJava 2.
+
 # Download
 
 Available on JCenter and MavenCentral. In your module :
