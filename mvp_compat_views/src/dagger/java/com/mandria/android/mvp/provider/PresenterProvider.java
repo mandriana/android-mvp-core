@@ -1,4 +1,8 @@
-package com.mandria.android.mvp;
+package com.mandria.android.mvp.provider;
+
+import com.mandria.android.mvp.HasPresenter;
+import com.mandria.android.mvp.Presenter;
+import com.mandria.android.mvp.PresenterCache;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

@@ -1,15 +1,16 @@
-package com.mandria.android.mvp;
+package com.mandria.android.mvp.provider;
+
+import com.mandria.android.mvp.MVPLogger;
+import com.mandria.android.mvp.Presenter;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 /**
  * Presenter factory.
  */
-@Singleton
 public class PresenterFactory {
 
     private final Map<Class<? extends Presenter>, Provider<Presenter>> mCreators;

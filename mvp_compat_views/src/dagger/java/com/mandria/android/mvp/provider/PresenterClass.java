@@ -1,4 +1,6 @@
-package com.mandria.android.mvp;
+package com.mandria.android.mvp.provider;
+
+import com.mandria.android.mvp.Presenter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

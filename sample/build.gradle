@@ -46,6 +46,9 @@ dependencies {
 
     implementation project(':mvp')
     implementation project(':mvp_compat_views')
+    // MVP
+    //implementation 'com.github.mandriana:mvp-core-rx2:1.1.0'
+    //implementation 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
 
     annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
     annotationProcessor "com.google.dagger:dagger-android-processor:$rootProject.ext.dagger"

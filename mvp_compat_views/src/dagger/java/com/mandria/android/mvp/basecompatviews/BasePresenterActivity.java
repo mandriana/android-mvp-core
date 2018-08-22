@@ -3,7 +3,7 @@ package com.mandria.android.mvp.basecompatviews;
 import com.mandria.android.mvp.HasPresenter;
 import com.mandria.android.mvp.Presenter;
 import com.mandria.android.mvp.PresenterController;
-import com.mandria.android.mvp.PresenterProvider;
+import com.mandria.android.mvp.provider.PresenterProvider;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +26,7 @@ public abstract class BasePresenterActivity<P extends Presenter> extends AppComp
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mPresenterProvider.onRestoreInstanceState(savedInstanceState.getBundle(PresenterController.CONTROLLER_STATE_KEY));
+            mPresenterProvider.onRestoreInstanceState(savedInstanceState.getBundle(PresenterProvider.CONTROLLER_STATE_KEY));
         }
 
         mPresenterProvider.preparePresenter(this);

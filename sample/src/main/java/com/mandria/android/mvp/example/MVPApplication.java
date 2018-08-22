@@ -5,26 +5,16 @@ import com.mandria.android.mvp.example.di.components.AppComponent;
 import com.mandria.android.mvp.example.di.components.DaggerAppComponent;
 import com.mandria.android.mvp.example.di.components.UserComponent;
 
-import android.app.Activity;
 import android.app.Application;
-
-import javax.inject.Inject;
-
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
 
 /**
  * Created by michael on 19/04/2017.
  */
-public class MVPApplication extends Application implements HasActivityInjector {
+public class MVPApplication extends Application {
 
-    private static AppComponent mAppComponent;
+    public static AppComponent mAppComponent;
 
-    private static UserComponent mUserComponent;
-
-    @Inject
-    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+    public static UserComponent mUserComponent;
 
     @Override
     public void onCreate() {
@@ -43,20 +33,9 @@ public class MVPApplication extends Application implements HasActivityInjector {
                 .builder()
                 .application(this)
                 .build();
-
-        mAppComponent.inject(this);
     }
 
     public static void makeUserComponent() {
         mUserComponent = mAppComponent.createUserComponent().build();
-    }
-
-    public static UserComponent getUserComponent() {
-        return mUserComponent;
-    }
-
-    @Override
-    public AndroidInjector<Activity> activityInjector() {
-        return dispatchingAndroidInjector;
     }
 }

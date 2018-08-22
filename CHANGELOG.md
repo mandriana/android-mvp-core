@@ -1,3 +1,6 @@
+## 1.1.0
+Created a presenter provider and presenter factory to allow constructor injected presenter when using base views with dagger.
+
 ## 1.0.11
 Fixed the cache synchronization subject by using a replay subject instead.
 The getValue() of the BehaviorSubject was returning null in some cases 

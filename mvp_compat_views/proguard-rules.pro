@@ -51,6 +51,12 @@
     public protected *;
 }
 
+# Preserve all package fields and methods.
+
+-keepclassmembers class * {
+  !public !protected !private *;
+}
+
 # Preserve all .class method names.
 
 -keepclassmembernames class * {

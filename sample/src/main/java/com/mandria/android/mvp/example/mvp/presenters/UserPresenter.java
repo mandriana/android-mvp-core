@@ -27,7 +27,7 @@ public class UserPresenter extends RxPresenter<MainView> {
     private final String mString;
 
     @Inject
-    public UserPresenter(TaskManager taskManager, @Named("testString") String test) {
+    public UserPresenter(TaskManager taskManager, @Named("TestString") String test) {
         mTaskManager = taskManager;
         mString = test;
     }

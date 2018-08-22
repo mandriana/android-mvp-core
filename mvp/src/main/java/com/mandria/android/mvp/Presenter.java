@@ -25,7 +25,7 @@ public abstract class Presenter<V> {
     /**
      * This method is called after the presenter is created and attached the first time to the view.
      */
-    protected void onCreatedThenAttached() {
+    public void onCreatedThenAttached() {
         MVPLogger.d(getClass().getSimpleName(), "On presenter created then view attached");
     }
 
@@ -67,7 +67,7 @@ public abstract class Presenter<V> {
      * @return The attached view or null if the view is not attached yet.
      */
     @Nullable
-    protected final V getView() {
+    public final V getView() {
         return mView;
     }
 
@@ -76,14 +76,14 @@ public abstract class Presenter<V> {
      *
      * @param bundle Bundle The bundle used to save presenter data, may be null.
      */
-    final void create(@Nullable Bundle bundle) {
+    public final void create(@Nullable Bundle bundle) {
         onCreate(bundle);
     }
 
     /**
      * Destroys the presenter.
      */
-    final void destroy() {
+    public final void destroy() {
         onDestroy();
     }
 
@@ -92,7 +92,7 @@ public abstract class Presenter<V> {
      *
      * @param state Bundle to save state into.
      */
-    final void save(@NonNull Bundle state) {
+    public final void save(@NonNull Bundle state) {
         onSave(state);
     }
 
@@ -101,7 +101,7 @@ public abstract class Presenter<V> {
      *
      * @param view View to attach.
      */
-    final void attachView(@NonNull V view) {
+    public final void attachView(@NonNull V view) {
         mView = view;
         onViewAttached(view);
     }
@@ -109,7 +109,7 @@ public abstract class Presenter<V> {
     /**
      * Detaches the view from the presenter.
      */
-    final void detachView() {
+    public final void detachView() {
         onViewDetached();
         mView = null;
     }

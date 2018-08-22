@@ -1,6 +1,6 @@
 package com.mandria.android.mvp.example.activities;
 
-import com.mandria.android.mvp.PresenterClass;
+import com.mandria.android.mvp.provider.PresenterClass;
 import com.mandria.android.mvp.basecompatviews.BasePresenterActivity;
 import com.mandria.android.mvp.example.MVPApplication;
 import com.mandria.android.mvp.example.R;
@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import dagger.android.AndroidInjection;
-
 /**
  * Created by michael on 13/04/2017.
  */
@@ -24,7 +22,7 @@ public class MainActivity extends BasePresenterActivity<MainPresenter> implement
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AndroidInjection.inject(this);
+        MVPApplication.mAppComponent.inject(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

@@ -4,7 +4,7 @@ package com.mandria.android.mvp.basecompatviews;
 import com.mandria.android.mvp.HasPresenter;
 import com.mandria.android.mvp.Presenter;
 import com.mandria.android.mvp.PresenterController;
-import com.mandria.android.mvp.PresenterProvider;
+import com.mandria.android.mvp.provider.PresenterProvider;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
