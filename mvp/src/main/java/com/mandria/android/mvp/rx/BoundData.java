@@ -1,11 +1,11 @@
 package com.mandria.android.mvp.rx;
 
-import rx.Notification;
+import io.reactivex.Notification;
 
 /**
  * This class binds a typed <View> view to some typed <Result> data.
  */
-class BoundData<View, Result> {
+public class BoundData<View, Result> {
 
     private final View mView;
 
@@ -17,15 +17,21 @@ class BoundData<View, Result> {
      * @param view View to bind.
      * @param data Data to bind.
      */
-    BoundData(View view, Notification<Result> data) {
+    public BoundData(View view, Notification<Result> data) {
         mView = view;
         mData = data;
     }
 
+    /**
+     * @return The view attached to the data.
+     */
     public View getView() {
         return mView;
     }
 
+    /**
+     * @return The notification from the observable.
+     */
     public Notification<Result> getData() {
         return mData;
     }

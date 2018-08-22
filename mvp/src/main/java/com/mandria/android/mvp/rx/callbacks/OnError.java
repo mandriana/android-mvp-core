@@ -2,13 +2,13 @@ package com.mandria.android.mvp.rx.callbacks;
 
 import android.support.annotation.NonNull;
 
-import rx.functions.Action2;
+import io.reactivex.functions.BiConsumer;
 
 /**
  * Interface for onError handler.
  */
-public interface OnError<U> extends Action2<U, Throwable> {
+public interface OnError<U> extends BiConsumer<U, Throwable> {
 
     @Override
-    void call(@NonNull U u, Throwable throwable);
+    void accept(@NonNull U u, Throwable throwable) throws Exception;
 }

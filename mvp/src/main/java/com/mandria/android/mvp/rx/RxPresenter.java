@@ -19,13 +19,18 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import rx.Notification;
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.ReplaySubject;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Notification;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.ReplaySubject;
+
 
 /**
  * A base presenter to use with RxJava features.
@@ -35,9 +40,14 @@ public class RxPresenter<V> extends Presenter<V> {
     private final String mTag = getClass().getSimpleName();
 
     /**
-     * Replay subject to fire the cache removal off all awaiting task.
+     * Replay subject to fire the cache removal of all awaiting task.
      */
     private final ReplaySubject<Boolean> mCacheSynchronization = ReplaySubject.create();
+
+    /**
+     * Cache synchronization replay subject disposable.
+     */
+    private Disposable mCacheSynchronizationDisposable;
 
     /**
      * Queue to store the observable tags which have terminated while manipulating the cache.
@@ -46,39 +56,40 @@ public class RxPresenter<V> extends Presenter<V> {
     private final List<String> mTerminatedQueue = new ArrayList<>();
 
     /**
-     * Behaviour subject to publish the view state through observable operations
+     * Behaviour subject to publish the view state through observable operations.
+     * View state is wrapped in a {@link RxView} since BehaviorSubject cannot emit null.
      */
-    private final BehaviorSubject<V> mView = BehaviorSubject.create();
+    private final BehaviorSubject<RxView<V>> mView = BehaviorSubject.create();
 
     /**
      * Map of cached observables.
      * Operations on this map should be synchronized to avoid concurrency access.
      */
-    private final ConcurrentHashMap<String, CacheableObservable<V, ?>> mCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CacheableStream<V, ?>> mCache = new ConcurrentHashMap<>();
 
     /**
      * Stores the subscriptions to release them in {@link #destroy()} call.
      */
-    private CompositeSubscription mSubscriptions;
+    private CompositeDisposable mDisposables;
 
     /**
      * Actions queue.
      */
-    private final HashMap<String, Action1<V>> mQueue = new HashMap<>();
+    private final HashMap<String, Consumer<V>> mQueue = new HashMap<>();
 
     @CallSuper
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
         super.onCreate(savedState);
 
-        mSubscriptions = new CompositeSubscription();
+        mDisposables = new CompositeDisposable();
 
         // The replay subject must be initialized when presenter is created
         mCacheSynchronization.onNext(false);
 
-        mCacheSynchronization.subscribe(new Action1<Boolean>() {
+        mCacheSynchronizationDisposable = mCacheSynchronization.subscribe(new Consumer<Boolean>() {
             @Override
-            public void call(Boolean manipulating) {
+            public void accept(Boolean manipulating) {
                 if (!manipulating && !mTerminatedQueue.isEmpty()) {
                     ListIterator<String> listIterator = mTerminatedQueue.listIterator();
                     while (listIterator.hasNext()) {
@@ -96,7 +107,7 @@ public class RxPresenter<V> extends Presenter<V> {
     protected void onViewAttached(@NonNull V view) {
         super.onViewAttached(view);
 
-        mView.onNext(view);
+        mView.onNext(new RxView<>(view));
         resumeQueue(view);
         resumeAll();
     }
@@ -106,8 +117,8 @@ public class RxPresenter<V> extends Presenter<V> {
     protected void onViewDetached() {
         super.onViewDetached();
 
-        mView.onNext(null);
-        unsubscribeAll();
+        mView.onNext(new RxView<V>(null));
+        disposeAll();
     }
 
     @CallSuper
@@ -115,37 +126,37 @@ public class RxPresenter<V> extends Presenter<V> {
     protected void onDestroy() {
         super.onDestroy();
 
-        mView.onCompleted();
+        mView.onComplete();
         cancelAll();
-        mCacheSynchronization.onCompleted();
+        mCacheSynchronization.onComplete();
+        mCacheSynchronizationDisposable.dispose();
     }
 
     /**
-     * Unsubscribes from all subscribed observables.
+     * Disposes from all subscribed observables.
      */
-    private void unsubscribeAll() {
-        if (mSubscriptions != null) {
-            mSubscriptions.clear();
-            mSubscriptions = new CompositeSubscription();
+    private void disposeAll() {
+        if (mDisposables != null) {
+            mDisposables.clear();
+            mDisposables = new CompositeDisposable();
         }
 
         mCacheSynchronization.onNext(true);
 
         for (String key : mCache.keySet()) {
-            mCache.get(key).unsubscribe();
+            mCache.get(key).dispose();
         }
 
         mCacheSynchronization.onNext(false);
     }
 
     /**
-     * Cancels all running observables by unsubscribing to them
-     * and clearing the cache.
+     * Cancels all running observables by disposing from them and clearing the cache.
      */
     protected final void cancelAll() {
-        if (mSubscriptions != null) {
-            mSubscriptions.clear();
-            mSubscriptions = new CompositeSubscription();
+        if (mDisposables != null) {
+            mDisposables.clear();
+            mDisposables = new CompositeDisposable();
         }
 
         mCacheSynchronization.onNext(true);
@@ -177,7 +188,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * @param tag Cached observable tag.
      */
     protected void cancel(String tag) {
-        CacheableObservable<V, ?> cached = mCache.get(tag);
+        CacheableStream<V, ?> cached = mCache.get(tag);
         if (cached != null) {
             cached.cancel();
             mCache.remove(tag);
@@ -195,22 +206,125 @@ public class RxPresenter<V> extends Presenter<V> {
     }
 
     /**
-     * Every observable subscription should be added here in order to avoid memory leak.
+     * Every disposable should be added here in order to avoid memory leak.
      * The subscriptions will be unsubscribed in {@link #onViewDetached()} callback.
      *
-     * @param subscription Observable subscription.
+     * @param disposable Observable subscription.
      */
-    public void addSubscription(Subscription subscription) {
-        mSubscriptions.add(subscription);
+    public void addSubscription(Disposable disposable) {
+        mDisposables.add(disposable);
     }
 
     /**
-     * Removes a previously registered subscription.
+     * Removes a previously registered disposable.
      *
-     * @param subscription Subscription to remove.
+     * @param disposable Subscription to remove.
      */
-    public void removeSubscription(Subscription subscription) {
-        mSubscriptions.remove(subscription);
+    public void removeSubscription(Disposable disposable) {
+        mDisposables.remove(disposable);
+    }
+
+    /**
+     * Gets a consumer for the stream which will dispatch events to each corresponding callback.
+     *
+     * @param onNext      OnNext action to call
+     * @param onError     OnError action to call
+     * @param onCompleted OnCompleted action to call
+     * @param <Result>    Result type of the observable.
+     * @return The consumer to attach to the stream.
+     */
+    private <Result> Consumer<BoundData<V, Result>> getCacheableStreamConsumer(@NonNull final String tag,
+            @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+        return new Consumer<BoundData<V, Result>>() {
+            @Override
+            public void accept(@io.reactivex.annotations.NonNull BoundData<V, Result> rxViewResultBoundData) throws Exception {
+                V view = rxViewResultBoundData.getView();
+                Notification<Result> notification = rxViewResultBoundData.getData();
+
+                if (onNext != null && notification.isOnNext()) {
+                    onNext.accept(view, notification.getValue());
+                } else if (onCompleted != null && notification.isOnComplete()) {
+                    onCompleted.accept(view);
+                } else if (onError != null && notification.isOnError()) {
+                    onError.accept(view, notification.getError());
+                }
+
+                if (notification.isOnComplete() || notification.isOnError()) {
+                    if (mCacheSynchronization.getValue()) {
+                        mTerminatedQueue.add(tag);
+                    } else {
+                        removeFromCache(tag);
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Calls the action once view is attached.
+     * The tag is used to remove the observable from the task queue if not started yet.
+     * In case it already started, calls {@link #cancel(String)} with the given tag, i.e. the tag parameter
+     * should be the same as the one used with {@link #start} methods (observable tag).
+     * This is intended to be used when {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])} need to
+     * start a task once view is attached.
+     *
+     * @param tag      Action tag (ideally same as observable tag if an observable should be started in the action0 param).
+     * @param consumer Consumer to call once view is attached.
+     */
+    public void startOnViewAttached(final String tag, final Consumer<V> consumer) {
+        if (mView.getValue() != null && mView.getValue().view != null) {
+            try {
+                consumer.accept(mView.getValue().view);
+            } catch (Exception e) {
+                MVPLogger.e(mTag, e.getMessage());
+            }
+        } else {
+            mQueue.put(tag, consumer);
+        }
+    }
+
+    /**
+     * Removes the action from the queue with the ability to cancel a task that as started with the same tag.
+     *
+     * @param tag             Action tag (ideally same as observable tag if an observable should be started in the action0 param).
+     * @param cancelIfStarted Tries to cancel the task if any matching the given tag.
+     */
+    public void cancelWaitingForViewAttached(String tag, boolean cancelIfStarted) {
+        mQueue.remove(tag);
+        if (cancelIfStarted) {
+            cancel(tag);
+        }
+    }
+
+    /**
+     * Resumes the queue.
+     */
+    private void resumeQueue(V view) {
+        if (!mQueue.isEmpty()) {
+            MVPLogger.d(mTag, String.format("%s action waited for view attached to start", mQueue.size()));
+            Iterator<Map.Entry<String, Consumer<V>>> queueIterator = mQueue.entrySet().iterator();
+            while (queueIterator.hasNext()) {
+                Map.Entry<String, Consumer<V>> next = queueIterator.next();
+                try {
+                    MVPLogger.d(mTag, String.format("Calling action for tag : %s", next.getKey()));
+                    next.getValue().accept(view);
+                } catch (Exception e) {
+                    MVPLogger.e(mTag, e.getMessage());
+                }
+                queueIterator.remove();
+            }
+        }
+    }
+
+    /**
+     * Gets if a task is still running by checking if it exists in the cache.
+     *
+     * @param tag Task tag.
+     * @return True if task is in progress else false.
+     */
+    public boolean isTaskInProgress(String tag) {
+        return mCache.containsKey(tag);
     }
 
     /**
@@ -219,11 +333,11 @@ public class RxPresenter<V> extends Presenter<V> {
      * </p>
      * <p>
      * If an existing observable with the same tag exists in cache, the observable will be resumed.
-     * Otherwise it will be added in the cached and started.
+     * Otherwise it will be added in the cache and started.
      * </p>
      * <p>
      * The withDefaultSchedulers parameter is used to attach or not the observable to default schedulers ({@link
-     * RxUtils#applyIOScheduler}).
+     * RxUtils#observableIOSchedulerTransformer}).
      * </p>
      *
      * @param tag                   Observable tag.
@@ -238,48 +352,24 @@ public class RxPresenter<V> extends Presenter<V> {
             @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
 
         // noinspection unchecked
-        CacheableObservable<V, Result> cached = (CacheableObservable<V, Result>) mCache.get(tag);
+        CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
 
         if (!mCache.containsKey(tag)) {
             MVPLogger.d(mTag, String.format("Starting task : %s", tag));
             if (withDefaultSchedulers) {
-                observable = observable.compose(RxUtils.<Result>applyIOScheduler());
+                observable = observable.compose(RxUtils.<Result>applyObservableIOScheduler());
             }
-            cached = new CacheableObservable<>(
+            cached = new CacheableStream<>(
                     observable,
                     mView,
-                    new Action1<BoundData<V, Result>>() {
-                        @Override
-                        public void call(BoundData<V, Result> vResultBoundData) {
-                            V view = vResultBoundData.getView();
-                            Notification<Result> notification = vResultBoundData.getData();
-
-                            if (onNext != null && notification.isOnNext()) {
-                                onNext.call(view, notification.getValue());
-                            } else if (onCompleted != null && notification.isOnCompleted()) {
-                                onCompleted.call(view);
-                            } else if (onError != null && notification.isOnError()) {
-                                onError.call(view, notification.getThrowable());
-                            }
-
-                            if (notification.isOnCompleted() || notification.isOnError()) {
-                                // Previous onTerminate action is executed here because at this point the view
-                                // had received the notification, no need to deal with backpressure
-                                if (mCacheSynchronization.getValue()) {
-                                    mTerminatedQueue.add(tag);
-                                } else {
-                                    removeFromCache(tag);
-                                }
-                            }
-                        }
-                    });
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
 
             if (!mCache.containsKey(tag)) {
                 mCache.put(tag, cached);
             } else {
                 cached.cancel();
                 // noinspection unchecked
-                cached = (CacheableObservable<V, Result>) mCache.get(tag);
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
             }
         } else {
             MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
@@ -296,7 +386,7 @@ public class RxPresenter<V> extends Presenter<V> {
      * action.
      * </p>
      * <p>
-     * Observable are attached with default schedulers ({@link RxUtils#applyIOScheduler}).
+     * Observable are attached with default schedulers ({@link RxUtils#observableIOSchedulerTransformer}).
      * </p>
      *
      * @param tag         Observable tag.
@@ -326,66 +416,336 @@ public class RxPresenter<V> extends Presenter<V> {
     }
 
     /**
-     * Calls the action once view is attached.
-     * The tag is used to remove the observable from the task queue if not started yet.
-     * In case it already started, calls {@link #cancel(String)} with the given tag, i.e. the tag parameter
-     * should be the same as the one used with {@link #start} methods (observable tag).
-     * This is intended, for instance, to be used when {@link android.app.Activity#onRequestPermissionsResult(int, String[], int[])} need to
-     * start a task once view is attached.
+     * <p>
+     * Starts a flowable.
+     * </p>
+     * <p>
+     * If an existing flowable with the same tag exists in cache, the flowable will be resumed.
+     * Otherwise it will be added in the cache and started.
+     * </p>
+     * <p>
+     * The withDefaultSchedulers parameter is used to attach or not the flowable to default schedulers ({@link
+     * RxUtils#applyFlowableIOScheduler()}).
+     * </p>
      *
-     * @param tag    Action tag (ideally same as observable tag if an observable should be started in the action0 param).
-     * @param action Action to call once view is attached.
+     * @param tag                   Flowable tag.
+     * @param flowable              Flowable to start.
+     * @param withDefaultSchedulers True if default schedulers should be applied.
+     * @param onNext                OnNext action to call
+     * @param onError               OnError action to call
+     * @param onCompleted           OnCompleted action to call
+     * @param <Result>              Result type of the flowable.
      */
-    public void startOnViewAttached(final String tag, final Action1<V> action) {
-        if (mView.getValue() != null) {
-            try {
-                action.call(mView.getValue());
-            } catch (Exception e) {
-                MVPLogger.e(mTag, e.getMessage());
+    public <Result> void start(@NonNull final String tag, @NonNull Flowable<Result> flowable, boolean withDefaultSchedulers,
+            @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+
+        // noinspection unchecked
+        CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
+
+        if (!mCache.containsKey(tag)) {
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
+            if (withDefaultSchedulers) {
+                flowable = flowable.compose(RxUtils.<Result>applyFlowableIOScheduler());
+            }
+            cached = new CacheableStream<>(
+                    flowable,
+                    mView,
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
+
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
             }
         } else {
-            mQueue.put(tag, action);
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
+        }
+
+        if (cached != null) {
+            cached.resume();
         }
     }
 
     /**
-     * Removes the action from the queue with the ability to cancel a task that as started with the same tag.
+     * <p>
+     * Shortcut for {@link #start(String, Flowable, boolean, OnNext, OnError, OnCompleted)} method but with no {@link OnCompleted}
+     * action.
+     * </p>
+     * <p>
+     * Observable are attached with default schedulers ({@link RxUtils#applyFlowableIOScheduler()}).
+     * </p>
      *
-     * @param tag             Action tag (ideally same as observable tag if an observable should be started in the action0 param).
-     * @param cancelIfStarted Tries to cancel the task if any matching the given tag.
+     * @param tag         Flowable tag.
+     * @param flowable    Flowable to start.
+     * @param onNext      OnNext action to call
+     * @param onError     OnError action to call
+     * @param onCompleted OnCompleted action to call
+     * @param <Result>    Result type of the flowable.
      */
-    public void cancelWaitingForViewAttached(String tag, boolean cancelIfStarted) {
-        mQueue.remove(tag);
-        if (cancelIfStarted) {
-            cancel(tag);
-        }
+    public <Result> void start(@NonNull final String tag, @NonNull Flowable<Result> flowable, @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+        start(tag, flowable, true, onNext, onError, onCompleted);
     }
 
     /**
-     * Resumes the queue.
+     * Shortcut for {@link #start(String, Flowable, OnNext, OnError, OnCompleted)} method but with no {@link OnCompleted} action.<br />
      *
-     * @param view The view attached to the presenter.
+     * @param tag      Flowable tag.
+     * @param flowable Flowable to start.
+     * @param onNext   OnNext action to call
+     * @param onError  OnError action to call
+     * @param <Result> Result type of the flowable.
      */
-    private void resumeQueue(V view) {
-        if (!mQueue.isEmpty()) {
-            MVPLogger.d(mTag, String.format("%s action waited for view attached to start", mQueue.size()));
-            Iterator<Map.Entry<String, Action1<V>>> queueIterator = mQueue.entrySet().iterator();
-            while (queueIterator.hasNext()) {
-                Map.Entry<String, Action1<V>> next = queueIterator.next();
-                MVPLogger.d(mTag, String.format("Calling action for tag : %s", next.getKey()));
-                next.getValue().call(view);
-                queueIterator.remove();
+    public <Result> void start(@NonNull final String tag, @NonNull Flowable<Result> flowable, @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError) {
+        start(tag, flowable, onNext, onError, null);
+    }
+
+    /**
+     * <p>
+     * Starts a single.
+     * </p>
+     * <p>
+     * If an existing single with the same tag exists in cache, the single will be resumed.
+     * Otherwise it will be added in the cache and started.
+     * </p>
+     * <p>
+     * The withDefaultSchedulers parameter is used to attach or not the single to default schedulers ({@link
+     * RxUtils#applySingleIOScheduler()}).
+     * </p>
+     *
+     * @param tag                   Single tag.
+     * @param single                Single to start.
+     * @param withDefaultSchedulers True if default schedulers should be applied.
+     * @param onNext                OnNext action to call
+     * @param onError               OnError action to call
+     * @param onCompleted           OnCompleted action to call
+     * @param <Result>              Result type of the single.
+     */
+    public <Result> void start(@NonNull final String tag, @NonNull Single<Result> single, boolean withDefaultSchedulers,
+            @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+
+        // noinspection unchecked
+        CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
+
+        if (!mCache.containsKey(tag)) {
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
+            if (withDefaultSchedulers) {
+                single = single.compose(RxUtils.<Result>applySingleIOScheduler());
             }
+            cached = new CacheableStream<>(
+                    single,
+                    mView,
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
+
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
+            }
+        } else {
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
+        }
+
+        if (cached != null) {
+            cached.resume();
         }
     }
 
     /**
-     * Gets if a task is still running by checking if it exists in the cache.
+     * <p>
+     * Shortcut for {@link #start(String, Single, boolean, OnNext, OnError, OnCompleted)} method but with no {@link OnCompleted}
+     * action.
+     * </p>
+     * <p>
+     * Observable are attached with default schedulers ({@link RxUtils#applySingleIOScheduler()}).
+     * </p>
      *
-     * @param tag Task tag.
-     * @return True if task is in progress else false.
+     * @param tag         Single tag.
+     * @param single      Single to start.
+     * @param onNext      OnNext action to call
+     * @param onError     OnError action to call
+     * @param onCompleted OnCompleted action to call
+     * @param <Result>    Result type of the single.
      */
-    public boolean isTaskInProgress(String tag) {
-        return mCache.containsKey(tag);
+    public <Result> void start(@NonNull final String tag, @NonNull Single<Result> single, @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+        start(tag, single, true, onNext, onError, onCompleted);
+    }
+
+    /**
+     * Shortcut for {@link #start(String, Single, OnNext, OnError, OnCompleted)} method but with no {@link OnCompleted} action.<br />
+     *
+     * @param tag      Single tag.
+     * @param single   Single to start.
+     * @param onNext   OnNext action to call
+     * @param onError  OnError action to call
+     * @param <Result> Result type of the single.
+     */
+    public <Result> void start(@NonNull final String tag, @NonNull Single<Result> single, @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError) {
+        start(tag, single, onNext, onError, null);
+    }
+
+    /**
+     * <p>
+     * Starts a completable.
+     * </p>
+     * <p>
+     * If an existing completable with the same tag exists in cache, the completable will be resumed.
+     * Otherwise it will be added in the cached and started.
+     * </p>
+     * <p>
+     * The withDefaultSchedulers parameter is used to attach or not the completable to default schedulers ({@link
+     * RxUtils#applyCompletableIOScheduler}).
+     * </p>
+     *
+     * @param tag                   Completable tag.
+     * @param completable           Completable to start.
+     * @param withDefaultSchedulers True if default schedulers should be applied.
+     * @param onError               OnError action to call
+     * @param onCompleted           OnCompleted action to call
+     */
+    public void start(@NonNull final String tag, @NonNull Completable completable, boolean withDefaultSchedulers,
+            @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+
+        // noinspection unchecked
+        CacheableStream<V, Object> cached = (CacheableStream<V, Object>) mCache.get(tag);
+
+        if (!mCache.containsKey(tag)) {
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
+            if (withDefaultSchedulers) {
+                completable = completable.compose(RxUtils.applyCompletableIOScheduler());
+            }
+            cached = new CacheableStream<>(
+                    completable,
+                    mView,
+                    getCacheableStreamConsumer(tag, null, onError, onCompleted));
+
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Object>) mCache.get(tag);
+            }
+        } else {
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
+        }
+
+        if (cached != null) {
+            cached.resume();
+        }
+    }
+
+    /**
+     * <p>
+     * Shortcut for {@link #start(String, Completable, boolean, OnError, OnCompleted)} method but with no {@link OnCompleted}
+     * action.
+     * </p>
+     * <p>
+     * Observable are attached with default schedulers ({@link RxUtils#applyCompletableIOScheduler()}).
+     * </p>
+     *
+     * @param tag         Completable tag.
+     * @param completable Completable to start.
+     * @param onError     OnError action to call
+     * @param onCompleted OnCompleted action to call
+     */
+    public void start(@NonNull final String tag, @NonNull Completable completable, @Nullable final OnError<V> onError,
+            @Nullable final OnCompleted<V> onCompleted) {
+        start(tag, completable, true, onError, onCompleted);
+    }
+
+    /**
+     * <p>
+     * Starts a maybe.
+     * </p>
+     * <p>
+     * If an existing maybe with the same tag exists in cache, the maybe will be resumed.
+     * Otherwise it will be added in the cache and started.
+     * </p>
+     * <p>
+     * The withDefaultSchedulers parameter is used to attach or not the maybe to default schedulers ({@link
+     * RxUtils#applyMaybeIOScheduler}).
+     * </p>
+     *
+     * @param tag                   Maybe tag.
+     * @param maybe                 Maybe to start.
+     * @param withDefaultSchedulers True if default schedulers should be applied.
+     * @param onNext                OnNext action to call
+     * @param onError               OnError action to call
+     * @param onCompleted           OnCompleted action to call
+     * @param <Result>              Result type of the maybe.
+     */
+    public <Result> void start(@NonNull final String tag, @NonNull Maybe<Result> maybe, boolean withDefaultSchedulers,
+            @Nullable final OnNext<V, Result> onNext, @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+
+        // noinspection unchecked
+        CacheableStream<V, Result> cached = (CacheableStream<V, Result>) mCache.get(tag);
+
+        if (!mCache.containsKey(tag)) {
+            MVPLogger.d(mTag, String.format("Starting task : %s", tag));
+            if (withDefaultSchedulers) {
+                maybe = maybe.compose(RxUtils.<Result>applyMaybeIOScheduler());
+            }
+            cached = new CacheableStream<>(
+                    maybe,
+                    mView,
+                    getCacheableStreamConsumer(tag, onNext, onError, onCompleted));
+
+            if (!mCache.containsKey(tag)) {
+                mCache.put(tag, cached);
+            } else {
+                cached.cancel();
+                // noinspection unchecked
+                cached = (CacheableStream<V, Result>) mCache.get(tag);
+            }
+        } else {
+            MVPLogger.d(mTag, String.format("Resuming task : %s", tag));
+        }
+
+        if (cached != null) {
+            cached.resume();
+        }
+    }
+
+    /**
+     * <p>
+     * Shortcut for {@link #start(String, Maybe, boolean, OnNext, OnError, OnCompleted)} method but with no {@link OnCompleted}
+     * action.
+     * </p>
+     * <p>
+     * Maybe are attached with default schedulers ({@link RxUtils#applyMaybeIOScheduler()}).
+     * </p>
+     *
+     * @param tag         Maybe tag.
+     * @param maybe       Maybe to start.
+     * @param onNext      OnNext action to call
+     * @param onError     OnError action to call
+     * @param onCompleted OnCompleted action to call
+     * @param <Result>    Result type of the maybe.
+     */
+    public <Result> void start(@NonNull final String tag, @NonNull Maybe<Result> maybe, @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError, @Nullable final OnCompleted<V> onCompleted) {
+        start(tag, maybe, true, onNext, onError, onCompleted);
+    }
+
+    /**
+     * Shortcut for {@link #start(String, Maybe, OnNext, OnError, OnCompleted)} method but with no {@link OnCompleted} action.<br />
+     *
+     * @param tag      Maybe tag.
+     * @param maybe    Maybe to start.
+     * @param onNext   OnNext action to call
+     * @param onError  OnError action to call
+     * @param <Result> Result type of the maybe.
+     */
+    public <Result> void start(@NonNull final String tag, @NonNull Maybe<Result> maybe, @Nullable final OnNext<V, Result> onNext,
+            @Nullable final OnError<V> onError) {
+        start(tag, maybe, onNext, onError, null);
     }
 }

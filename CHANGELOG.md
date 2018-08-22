@@ -1,3 +1,6 @@
+## 1.1.0
+Created a presenter provider and presenter factory to allow constructor injected presenter when using base views with dagger.
+
 ## 1.0.11
 Fixed the cache synchronization subject by using a replay subject instead.
 The getValue() of the BehaviorSubject was returning null in some cases 
@@ -18,19 +21,18 @@ Fixed presenter destruction.
 Fixed pom publication in aar.
 Added missing annotation Nullable, NonNull ... (for better kotlin support).
 
-## 1.0.6
+## 1.0.6 
 Upgraded dependencies.
 Added use of ConcurrentHashmap for observable cache in RxPresenter.
 
-## 1.0.5 (mvp-base-views with and without dagger)
-Fixed presenter lifecycle in onPause, onDestroy and finish.
+## 1.0.5 (Core only)
+Upgraded dependencies versions.
+Fixed tag in AbstractSubscriptionProxy.
 
 ## 1.0.4
-Added logs and ability to activate/deactivate them.
-
-## 1.0.3
 Upgraded dependencies versions.
 Fixed a bug when retrieving a presenter from the cache when multiple views with presenters were created in a very short time.
+Added logs and ability to activate/deactivate them.
 
 ## 1.0.2
 startOnViewAttached now accepts an Action1 to provide the view as action parameter.

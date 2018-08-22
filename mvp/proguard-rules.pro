@@ -51,6 +51,10 @@
     public protected *;
 }
 
+-keep public final class * {
+    public protected *;
+}
+
 # Preserve all .class method names.
 
 -keepclassmembernames class * {

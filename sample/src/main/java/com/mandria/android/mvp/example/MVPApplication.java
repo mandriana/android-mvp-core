@@ -1,10 +1,9 @@
 package com.mandria.android.mvp.example;
 
 import com.mandria.android.mvp.MVPLogger;
-import com.mandria.android.mvp.di.CoreModule;
 import com.mandria.android.mvp.example.di.components.AppComponent;
 import com.mandria.android.mvp.example.di.components.DaggerAppComponent;
-import com.mandria.android.mvp.example.di.modules.AppModule;
+import com.mandria.android.mvp.example.di.components.UserComponent;
 
 import android.app.Application;
 
@@ -13,7 +12,9 @@ import android.app.Application;
  */
 public class MVPApplication extends Application {
 
-    private static AppComponent mAppComponent;
+    public static AppComponent mAppComponent;
+
+    public static UserComponent mUserComponent;
 
     @Override
     public void onCreate() {
@@ -28,13 +29,13 @@ public class MVPApplication extends Application {
      * Initializes the injector.
      */
     private void initializeInjector() {
-        mAppComponent = DaggerAppComponent.builder()
-                .coreModule(new CoreModule())
-                .appModule(new AppModule(this))
+        mAppComponent = DaggerAppComponent
+                .builder()
+                .application(this)
                 .build();
     }
 
-    public static AppComponent getAppComponent() {
-        return mAppComponent;
+    public static void makeUserComponent() {
+        mUserComponent = mAppComponent.createUserComponent().build();
     }
 }

@@ -14,19 +14,12 @@ import dagger.Provides;
 public class CoreModule {
 
     /**
-     * Constructor.
-     */
-    public CoreModule() {
-
-    }
-
-    /**
      * Provides the presenter cache.
      *
      * @return Presenter cache.
      */
-    @Provides
     @Singleton
+    @Provides
     public PresenterCache getPresenterCache() {
         return new PresenterCache();
     }

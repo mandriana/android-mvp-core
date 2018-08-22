@@ -8,7 +8,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.11"
+        versionName "1.1.0"
     }
     buildTypes {
         release {
@@ -21,28 +21,28 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     api "com.android.support:support-annotations:$rootProject.ext.supportLibraryVersion"
 
     // Rx
-    api "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
+    api "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rx2AndroidVersion"
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
-    api "io.reactivex:rxjava:$rootProject.ext.rxjava"
+    api "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava2"
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'mvp-core'
+    bintrayName = 'mvp-core-rx2'
     orgName = 'michaelandria'
 
     publishedGroupId = 'com.github.mandriana'
     libraryName = 'MVPCore'
-    artifact = 'mvp-core'
-    libraryVersion = '1.0.11'
+    artifact = 'mvp-core-rx2'
+    libraryVersion = '1.1.0'
 
     libraryDescription = 'A library to set up a mvp architecture on Android'
 

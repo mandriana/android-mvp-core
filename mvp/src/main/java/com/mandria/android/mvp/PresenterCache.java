@@ -6,13 +6,13 @@ import java.util.HashMap;
  * <p>A cache for the presenter.</p>
  * <p>This class should be a singleton or used with a dependency injector to be injected as an application singleton.</p>
  */
-public class PresenterCache {
+public final class PresenterCache {
 
     private static final String TAG = "PresenterCache";
 
-    private HashMap<String, Presenter> mIdToPresenter = new HashMap<>();
+    private HashMap<String, Presenter> mIdToPresenter;
 
-    private HashMap<Presenter, String> mPresenterToId = new HashMap<>();
+    private HashMap<Presenter, String> mPresenterToId;
 
     /**
      * Constructor.
@@ -30,7 +30,7 @@ public class PresenterCache {
      * @return The presenter of the corresponding id.
      */
     @SuppressWarnings("unchecked")
-    <P> P getPresenter(String id) {
+    public <P> P getPresenter(String id) {
         return (P) mIdToPresenter.get(id);
     }
 
@@ -39,7 +39,7 @@ public class PresenterCache {
      *
      * @param presenter Presenter to save.
      */
-    void savePresenter(Presenter presenter) {
+    public void savePresenter(Presenter presenter) {
         String id = presenter.getClass().getSimpleName() + "/" + System.nanoTime() + "/" + (int) (Math.random() * Integer.MAX_VALUE);
 
         MVPLogger.d(TAG, String.format("Saving presenter %s to cache with id %s", presenter.getClass().getSimpleName(), id));
@@ -54,7 +54,7 @@ public class PresenterCache {
      * @param presenter Presenter to retrieve the id from.
      * @return The presenter id or null.
      */
-    String getId(Presenter presenter) {
+    public String getId(Presenter presenter) {
         return mPresenterToId.get(presenter);
     }
 
@@ -63,7 +63,7 @@ public class PresenterCache {
      *
      * @param presenter Presenter to remove.
      */
-    void removePresenter(Presenter presenter) {
+    public void removePresenter(Presenter presenter) {
         MVPLogger.d(TAG, String.format("Removing presenter %s from cache", presenter.getClass().getSimpleName()));
 
         mIdToPresenter.remove(mPresenterToId.get(presenter));
