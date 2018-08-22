@@ -6,6 +6,15 @@ MVP Core is an Android Library which will help you to set up a MVP architecture 
 
 This version supports RxJava 2.
 
+# AndroidX
+
+If you plan to use the mvp-base-views extensions and you are using AndroidX dependencies
+you should use MVP libraries starting at version 2.0.0 : 
+https://github.com/mandriana/android-mvp-core/tree/rx2-androidx
+
+Versions of the library 1.x will are intended to use support compat.  
+Versions 2.x will use AndroidX.
+
 # Download
 
 Available on JCenter and MavenCentral. In your module :
