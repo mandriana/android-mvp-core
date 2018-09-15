@@ -40,8 +40,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Mvp library
-    //implementation project(':mvp')
-    implementation "com.github.mandriana:mvp-core-rx2:$rootProject.ext.mvp_core"
+    implementation project(':mvp')
+    //implementation "com.github.mandriana:mvp-core-rx2:$rootProject.ext.mvp_core"
 
     // Android support
     api "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
