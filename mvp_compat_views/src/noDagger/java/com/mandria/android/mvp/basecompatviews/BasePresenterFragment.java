@@ -52,14 +52,14 @@ public abstract class BasePresenterFragment<P extends Presenter> extends Fragmen
 
     @Override
     public void onPause() {
-        super.onPause();
         mPresenterController.detachViewFromPresenter(false);
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mPresenterController.detachViewFromPresenter(!getActivity().isChangingConfigurations());
+        super.onDestroy();
     }
 
     @Override
