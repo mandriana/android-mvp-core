@@ -46,8 +46,8 @@ public abstract class BasePresenterActivity<P extends Presenter> extends AppComp
 
     @Override
     protected void onPause() {
-        super.onPause();
         mPresenterProvider.detachViewFromPresenter(isFinishing());
+        super.onPause();
     }
 
     @Override
