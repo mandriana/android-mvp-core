@@ -1,0 +1,57 @@
+ext.versions = [
+        minSdk         : 16,
+        targetSdk      : 28,
+        compileSdk     : 28,
+        buildTools     : '28.0.2',
+
+        androidPlugin  : '3.2.0-rc03',
+        kotlin         : "1.2.70",
+        gradleBintray  : "1.8.4",
+        mavenGradle    : "1.4.1",
+
+        support        : "27.1.1",
+        androidx       : "1.0.0-rc02",
+        rxJava         : "2.1.8",
+        rxAndroid      : "2.0.2",
+        dagger         : "2.16",
+        mvpCore        : "2.0.1",
+        javaxAnnotation: "1.0"
+]
+
+ext.deps = [
+        android  : [
+                'gradlePlugin': "com.android.tools.build:gradle:${versions.androidPlugin}"
+        ],
+        support  : [
+                'appCompat': "com.android.support:appcompat-v7:${versions.support}"
+        ],
+        androidx : [
+                'appCompat'  : "androidx.appcompat:appcompat:${versions.androidx}",
+                'annotations': "androidx.annotation:annotation:${versions.androidx}"
+        ],
+        kotlin   : [
+                'gradlePlugin': "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+                'stdlib'      : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
+        ],
+        reactivex: [
+                'rxJava'   : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
+                'rxAndroid': "io.reactivex.rxjava2:rxandroid:${versions.rxAndroid}"
+        ],
+        google   : [
+                'dagger'                : "com.google.dagger:dagger:${versions.dagger}",
+                'daggerProcessor'       : "com.google.dagger:dagger-compiler:${versions.dagger}",
+                'daggerAndroid'         : "com.google.dagger:dagger-android:${versions.dagger}",
+                'daggerAndroidSupport'  : "com.google.dagger:dagger-android-support:${versions.dagger}",
+                'daggerAndroidCompiloer': "com.google.dagger:dagger-android-processor:${versions.dagger}",
+        ],
+        javax    : [
+                'annotation': "javax.annotation:jsr250-api:${versions.javaxAnnotation}"
+        ],
+        mvp : [
+                'core' : "com.github.mandriana:mvp-core-rx2:${versions.mvpCore}",
+                'coreKt' : "com.github.mandriana:mvp-core-rx2-kt:${versions.mvpCore}"
+        ]
+]
+
+
+

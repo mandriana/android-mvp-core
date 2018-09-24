@@ -1,0 +1,55 @@
+apply plugin: 'com.android.library'
+
+ext {
+    /** Bintray and pom configuration specific to this module **/
+
+    bintrayName = conf.bintray.core.bintrayName
+
+    libraryName = conf.bintray.core.libraryName
+    artifact = conf.bintray.core.artifact
+
+    libraryDescription = conf.bintray.core.libraryDescription
+
+    /** Maven publish configuration **/
+
+    // Name of the gradle maven publication
+    publicationName = conf.maven.publication.core
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName conf.bintray.common.libraryVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer.pro'
+        }
+    }
+    defineOutputForAars(conf.bintray.core.artifact, conf.bintray.common.libraryVersion, libraryVariants)
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    api deps.androidx.annotations
+
+    // Rx
+    api deps.reactivex.rxJava
+    api deps.reactivex.rxAndroid
+
+    testImplementation 'junit:junit:4.12'
+}
+
+apply from: rootProject.file('gradleScripts/install-v1.gradle')
+apply from: rootProject.file('gradleScripts/bintray-android-v1.gradle')

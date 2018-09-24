@@ -1,0 +1,63 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+ext {
+    /** Bintray and pom configuration specific to this module **/
+
+    bintrayName = conf.bintray.coreKotlin.bintrayName
+
+    libraryName = conf.bintray.coreKotlin.libraryName
+    artifact = conf.bintray.coreKotlin.artifact
+
+    libraryDescription = conf.bintray.coreKotlin.libraryDescription
+
+    /** Maven publish configuration **/
+
+    // Name of the gradle maven publication
+    publicationName = conf.maven.publication.coreKotlin
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName conf.bintray.common.libraryVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer.pro'
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defineOutputForAars(conf.bintray.coreKotlin.artifact, conf.bintray.common.libraryVersion,libraryVariants)
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation deps.kotlin.stdlib
+
+    api deps.androidx.annotations
+
+    // Rx
+    api deps.reactivex.rxJava
+    api deps.reactivex.rxAndroid
+
+    testImplementation 'junit:junit:4.12'
+}
+
+apply from: rootProject.file('gradleScripts/install-v1.gradle')
+apply from: rootProject.file('gradleScripts/bintray-android-v1.gradle')

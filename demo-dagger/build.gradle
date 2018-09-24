@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        applicationId "com.mandria.android.mvp.example"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation deps.androidx.appCompat
+
+    implementation project(':core')
+    implementation project(':views_dagger')
+    // MVP
+    //implementation 'com.github.mandriana:mvp-core-rx2:1.1.0'
+    //implementation 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
+
+    annotationProcessor deps.google.daggerProcessor
+    annotationProcessor deps.google.daggerAndroidCompiloer
+    implementation deps.google.daggerAndroid
+    implementation deps.google.daggerAndroidSupport
+
+    testImplementation 'junit:junit:4.12'
+}

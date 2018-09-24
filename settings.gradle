@@ -1,1 +1,5 @@
-include ':sample', ':mvp', ':mvp_compat_views'
+include ':demo-dagger',
+        ':core', ':core_kotlin',
+        ':views',
+        ':views_dagger',
+        ':views_dagger_kotlin'

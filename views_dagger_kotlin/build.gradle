@@ -1,0 +1,71 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+ext {
+    /** Bintray and pom configuration specific to this module **/
+
+    bintrayName = conf.bintray.viewsDaggerKotlin.bintrayName
+
+    libraryName = conf.bintray.viewsDaggerKotlin.libraryName
+    artifact = conf.bintray.viewsDaggerKotlin.artifact
+
+    libraryDescription = conf.bintray.viewsDaggerKotlin.libraryDescription
+
+    /** Maven publish configuration **/
+
+    // Name of the gradle maven publication
+    publicationName = conf.maven.publication.viewsDaggerKotlin
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName conf.bintray.common.libraryVersion
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer.pro'
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defineOutputForAars(conf.bintray.viewsDaggerKotlin.artifact, conf.bintray.common.libraryVersion, libraryVariants)
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation deps.kotlin.stdlib
+
+    // Mvp library
+    debugImplementation project(':core_kotlin')
+    releaseImplementation deps.mvp.coreKt
+
+    // Android support
+    api deps.androidx.appCompat
+
+    // Dagger 2
+    api deps.google.dagger
+    kapt deps.google.daggerProcessor
+    compileOnly deps.javax.annotation
+
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+}
+
+apply from: rootProject.file('gradleScripts/install-v1.gradle')
+apply from: rootProject.file('gradleScripts/bintray-android-v1.gradle')

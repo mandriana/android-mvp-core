@@ -1,0 +1,118 @@
+ext.conf = [
+        bintray: [
+                common           : [
+                        repo            : 'mavenTest',
+                        orgName         : 'michaelandria',
+                        publishedGroupId: 'com.github.mandriana',
+                        libraryVersion  : '2.0.1',
+
+                        siteUrl         : 'https://github.com/michaelandria/android-mvp-core',
+                        gitUrl          : 'https://github.com/michaelandria/android-mvp-core.git',
+                        developerId     : 'michaelandria',
+                        developerName   : 'michaelandria',
+                        developerEmail  : 'mika.andria@gmail.com',
+
+                        licenseName     : 'The Apache Software License, Version 2.0',
+                        licenseUrl      : 'http://www.apache.org/licenses/LICENSE-2.0.txt',
+                        allLicenses     : ["Apache-2.0"],
+                        bintrayLabels   : ['aar', 'android', 'architecture', 'MVP'],
+                ],
+
+                core             : [
+                        bintrayName       : 'mvp-core-rx2',
+                        artifact          : 'mvp-core-rx2',
+                        libraryName       : 'MVPCore',
+                        libraryDescription: 'A library to set up a mvp architecture on Android'
+                ],
+
+                coreKotlin       : [
+                        bintrayName       : 'mvp-core-rx2-kt',
+                        artifact          : 'mvp-core-rx2-kt',
+                        libraryName       : 'MVPCore',
+                        libraryDescription: 'A library to set up a mvp architecture on Android'
+                ],
+
+                views            : [
+                        bintrayName       : 'mvp-base-views-rx2',
+                        artifact          : 'mvp-base-views-rx2',
+                        libraryName       : 'MVP base views',
+                        libraryDescription: 'A set of base views to be used with mvp-core'
+                ],
+
+                viewsKotlin      : [
+                        bintrayName       : 'mvp-base-views-rx2-kt',
+                        artifact          : 'mvp-base-views-rx2-kt',
+                        libraryName       : 'MVP base views',
+                        libraryDescription: 'A set of base views to be used with mvp-core'
+                ],
+
+                viewsDagger      : [
+                        bintrayName       : 'mvp-base-views-rx2-dagger',
+                        artifact          : 'mvp-base-views-rx2-dagger',
+                        libraryName       : 'MVP base views',
+                        libraryDescription: 'A set of base views to be used with mvp-core'
+                ],
+
+                viewsDaggerKotlin: [
+                        bintrayName       : 'mvp-base-views-rx2-dagger-kt',
+                        artifact          : 'mvp-base-views-rx2-dagger-kt',
+                        libraryName       : 'MVP base views',
+                        libraryDescription: 'A set of base views to be used with mvp-core'
+                ],
+
+                viewsKoin        : [
+                        bintrayName       : 'mvp-base-views-rx2-koin',
+                        artifact          : 'mvp-base-views-rx2-koin',
+                        libraryName       : 'MVP base views',
+                        libraryDescription: 'A set of base views to be used with mvp-core'
+                ]
+        ],
+        maven  : [
+                publication: [
+                        core             : 'core',
+                        coreKotlin       : 'coreKotlin',
+                        views            : 'views',
+                        viewsKotlin      : 'viewsKotlin',
+                        viewsDagger      : 'viewsDagger',
+                        viewsDaggerKotlin: 'viewsDaggerKotlin',
+                        viewsKoin        : 'viewsKoin'
+                ]
+        ]
+]
+
+ext {
+    bintrayRepo = conf.bintray.common.repo
+    orgName = conf.bintray.common.orgName
+
+    publishedGroupId = conf.bintray.common.publishedGroupId
+
+    libraryVersion = conf.bintray.common.libraryVersion
+
+    siteUrl = conf.bintray.common.siteUrl
+    gitUrl = conf.bintray.common.gitUrl
+
+    developerId = conf.bintray.common.developerId
+    developerName = conf.bintray.common.developerName
+    developerEmail = conf.bintray.common.developerEmail
+
+    licenseName = conf.bintray.common.licenseName
+    licenseUrl = conf.bintray.common.licenseUrl
+    allLicenses = conf.bintray.common.allLicenses
+
+    bintrayLabels = conf.bintray.common.bintrayLabels
+}
+
+ext.getAarFileNameForVariant = { artifact, version, variant ->
+    "${artifact}-${version}-${variant.buildType.name}.aar"
+}
+
+ext.defineOutputForAars = { artifact, version, libraryVariants ->
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (outputFileName != null && outputFileName.endsWith('.aar')) {
+                def fileName = getAarFileNameForVariant(artifact, version, variant)
+                outputFileName = new File(fileName)
+            }
+        }
+    }
+}

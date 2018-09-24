@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+
+ext {
+    /** Bintray and pom configuration specific to this module **/
+
+    bintrayName = conf.bintray.views.bintrayName
+
+    libraryName = conf.bintray.views.libraryName
+    artifact = conf.bintray.views.artifact
+
+    libraryDescription = conf.bintray.views.libraryDescription
+
+    /** Maven publish configuration **/
+
+    // Name of the gradle maven publication
+    publicationName = conf.maven.publication.views
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName conf.bintray.common.libraryVersion
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-consumer.pro'
+        }
+    }
+    defineOutputForAars(conf.bintray.views.artifact, conf.bintray.common.libraryVersion, libraryVariants)
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Mvp library
+    debugImplementation project(':core')
+    releaseImplementation deps.mvp.core
+
+    // Android support
+    api deps.androidx.appCompat
+
+    testImplementation 'junit:junit:4.12'
+}
+
+apply from: rootProject.file('gradleScripts/install-v1.gradle')
+apply from: rootProject.file('gradleScripts/bintray-android-v1.gradle')

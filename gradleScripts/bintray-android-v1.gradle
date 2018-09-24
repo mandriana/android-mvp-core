@@ -3,7 +3,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-version = ext.libraryVersion
+version = libraryVersion
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -21,6 +21,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+// Retrieve credentials
 def _user = System.getenv("BINTRAY_USER")
 def _key = System.getenv("BINTRAY_API_KEY")
 def _passphrase = System.getenv("BINTRAY_PASSPHRASE")
@@ -30,10 +31,11 @@ if (project.rootProject.file('local.properties').exists() && (_user == null || _
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
     _user = properties.getProperty("bintray.user")
-    _key = properties.getProperty("bintray.apikey");
+    _key = properties.getProperty("bintray.apikey")
     _passphrase = properties.getProperty("bintray.gpg.password")
 }
 
+// Pom configuration to append
 def pomConfig = {
     licenses {
         license {
@@ -55,65 +57,82 @@ def pomConfig = {
     }
 }
 
-publishing.publications {
-    core(MavenPublication) {
-        groupId project.ext.publishedGroupId
-        artifactId = project.ext.artifact
-        version project.ext.libraryVersion
+// We define here our publication tasks and a local repository.
+publishing {
+    publications {
+        "${publicationName}"(MavenPublication) {
+            groupId publishedGroupId
+            artifactId = artifact
+            version libraryVersion
 
-        artifact "$buildDir/outputs/aar/${project.ext.artifact}-${version}-release.aar"
-        artifact sourcesJar
-        artifact javadocJar
+            artifact "$buildDir/outputs/aar/${artifact}-${version}-release.aar"
+            artifact sourcesJar
+            artifact javadocJar
 
-        // adds pom data
-        pom.withXml {
-            asNode().appendNode('name', libraryName)
-            asNode().appendNode('description', 'A MVP library for Android')
-            asNode().appendNode('url', siteUrl)
+            // adds pom data
+            pom.withXml {
+                asNode().appendNode('name', libraryName)
+                asNode().appendNode('description', libraryDescription)
+                asNode().appendNode('url', siteUrl)
 
-            // creating additional node for dependencies
-            def dependenciesNode = asNode().appendNode('dependencies')
+                // creating additional node for dependencies
+                def dependenciesNode = asNode().appendNode('dependencies')
 
-            // defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-            def configurationNames = ["releaseImplementation", "api"]
+                // defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
+                def configurationNames = ["releaseImplementation", "api"]
 
-            configurationNames.each { configurationName ->
-                // iterates over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
-                configurations[configurationName].allDependencies.each {
-                    if (it.group != null && it.group != '' && it.group != 'unspecified'
-                            && it.name != null && it.name != '' && it.name != 'unspecified' && it.version != 'unspecified') {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
+                configurationNames.each { configurationName ->
+                    // iterates over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+                    configurations[configurationName].allDependencies.each {
+                        if (it.group != null && it.group != '' && it.group != 'unspecified'
+                                && it.name != null && it.name != '' && it.name != 'unspecified'
+                                && it.version != 'unspecified') {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
 
-                        //If there are any exclusions in dependency
-                        if (it.excludeRules.size() > 0) {
-                            def exclusionsNode = dependencyNode.appendNode('exclusions')
-                            it.excludeRules.each { rule ->
-                                def exclusionNode = exclusionsNode.appendNode('exclusion')
-                                exclusionNode.appendNode('groupId', rule.group)
-                                exclusionNode.appendNode('artifactId', rule.module)
+                            //If there are any exclusions in dependency
+                            if (it.excludeRules.size() > 0) {
+                                def exclusionsNode = dependencyNode.appendNode('exclusions')
+                                it.excludeRules.each { rule ->
+                                    def exclusionNode = exclusionsNode.appendNode('exclusion')
+                                    exclusionNode.appendNode('groupId', rule.group)
+                                    exclusionNode.appendNode('artifactId', rule.module)
+                                }
                             }
                         }
                     }
                 }
+                asNode().children().last() + pomConfig
             }
-            asNode().children().last() + pomConfig
+        }
+    }
+    repositories {
+        maven {
+            name = 'Local'
+            url rootProject.file('repo/')
         }
     }
 }
 
-// Bintray
+// Publish locally
+task publishLocal {
+    //dependsOn ":${project.name}:clean"
+    dependsOn ":${project.name}:assemble"
+    dependsOn ":${project.name}:publish"
+}
+
+// Bintray dependencies and configuration
+bintrayUpload.dependsOn assemble
+bintrayUpload.dependsOn sourcesJar
+bintrayUpload.dependsOn javadocJar
 
 bintray {
     user = _user
     key = _key
-    publications = ["core"]
-
-    //archivesBaseName = artifact
+    publications = ["${publicationName}"]
     override = true
-    //configurations = ['archives']
     pkg {
         repo = bintrayRepo
         name = bintrayName
