@@ -1,11 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion versions.buildTools
 
     defaultConfig {
-        applicationId "com.mandria.android.mvp.example"
+        applicationId "com.mandria.android.mvp.kotlin.example"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
 
@@ -19,20 +21,26 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation deps.kotlin.stdlib
+
     implementation deps.androidx.appCompat
 
-    implementation project(':core')
-    implementation project(':views_dagger')
+    implementation project(':core_kotlin')
+    implementation project(':views_dagger_kotlin')
     // MVP
     //implementation 'com.github.mandriana:mvp-core-rx2:1.1.0'
     //implementation 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
 
-    annotationProcessor deps.google.daggerProcessor
+    kapt deps.google.daggerProcessor
     annotationProcessor deps.google.daggerAndroidCompiler
     implementation deps.google.daggerAndroid
     implementation deps.google.daggerAndroidSupport

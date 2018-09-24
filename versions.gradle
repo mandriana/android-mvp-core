@@ -38,18 +38,18 @@ ext.deps = [
                 'rxAndroid': "io.reactivex.rxjava2:rxandroid:${versions.rxAndroid}"
         ],
         google   : [
-                'dagger'                : "com.google.dagger:dagger:${versions.dagger}",
-                'daggerProcessor'       : "com.google.dagger:dagger-compiler:${versions.dagger}",
-                'daggerAndroid'         : "com.google.dagger:dagger-android:${versions.dagger}",
-                'daggerAndroidSupport'  : "com.google.dagger:dagger-android-support:${versions.dagger}",
-                'daggerAndroidCompiloer': "com.google.dagger:dagger-android-processor:${versions.dagger}",
+                'dagger'               : "com.google.dagger:dagger:${versions.dagger}",
+                'daggerProcessor'      : "com.google.dagger:dagger-compiler:${versions.dagger}",
+                'daggerAndroid'        : "com.google.dagger:dagger-android:${versions.dagger}",
+                'daggerAndroidSupport' : "com.google.dagger:dagger-android-support:${versions.dagger}",
+                'daggerAndroidCompiler': "com.google.dagger:dagger-android-processor:${versions.dagger}",
         ],
         javax    : [
                 'annotation': "javax.annotation:jsr250-api:${versions.javaxAnnotation}"
         ],
-        mvp : [
-                'core' : "com.github.mandriana:mvp-core-rx2:${versions.mvpCore}",
-                'coreKt' : "com.github.mandriana:mvp-core-rx2-kt:${versions.mvpCore}"
+        mvp      : [
+                'core'  : "com.github.mandriana:mvp-core-rx2:${versions.mvpCore}",
+                'coreKt': "com.github.mandriana:mvp-core-rx2-kt:${versions.mvpCore}"
         ]
 ]
 
