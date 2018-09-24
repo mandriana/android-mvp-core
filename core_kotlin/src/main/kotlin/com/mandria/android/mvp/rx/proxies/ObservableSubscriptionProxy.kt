@@ -58,9 +58,9 @@ class ObservableSubscriptionProxy<View, Result>(
     override fun subscribe(consumer: Consumer<BoundData<View, Result>>): Disposable {
         dispose()
 
-        return observable.subscribe().apply {
-            disposable = this
-            compositeDisposable.add(this)
+        return observable.subscribe(consumer).also {
+            disposable = it
+            compositeDisposable.add(it)
         }
     }
 

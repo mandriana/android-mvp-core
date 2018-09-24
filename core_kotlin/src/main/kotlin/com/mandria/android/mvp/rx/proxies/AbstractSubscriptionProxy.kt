@@ -34,7 +34,7 @@ abstract class AbstractSubscriptionProxy<View, Result> {
                     dispose()
                 }
 
-            BoundData(rxView.view!!, replayNotification)
+            BoundData(rxView.view, replayNotification)
         }
         filterPredicate = Predicate { it.view != null }
     }

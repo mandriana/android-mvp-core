@@ -65,9 +65,9 @@ class FlowableSubscriptionProxy<View, Result>(
     override fun subscribe(consumer: Consumer<BoundData<View, Result>>): Disposable {
         dispose()
 
-        return flowable.subscribe().apply {
-            disposable = this
-            compositeDisposable.add(this)
+        return flowable.subscribe(consumer).also {
+            disposable = it
+            compositeDisposable.add(it)
         }
     }
 

@@ -55,6 +55,9 @@ open class RxPresenter<V : Any> : Presenter<V>() {
 
         disposables = CompositeDisposable()
 
+        // The replay subject must be initialized when presenter is created
+        cacheSynchronization.onNext(false)
+
         cacheSynchronizationDisposable = cacheSynchronization.subscribe { manipulating ->
             if (!manipulating && !terminatedQueue.isEmpty()) {
                 val listIterator = terminatedQueue.listIterator()
@@ -96,23 +99,26 @@ open class RxPresenter<V : Any> : Presenter<V>() {
 
     /** Disposes from all subscribed streams. **/
     private fun disposeAll() {
-        disposables?.clear()
-        disposables = CompositeDisposable()
+        disposables?.let {
+            it.clear()
+            disposables = CompositeDisposable()
+        }
 
         cacheSynchronization.onNext(true)
 
         for (key in cache.keys()) {
             cache[key]?.dispose()
         }
-        cache.clear()
 
         cacheSynchronization.onNext(false)
     }
 
     /** Cancels all running streams by disposing from them and clearing the cache. **/
     protected fun cancelAll() {
-        disposables?.clear()
-        disposables = CompositeDisposable()
+        disposables?.let {
+            it.clear()
+            disposables = CompositeDisposable()
+        }
 
         cacheSynchronization.onNext(true)
 
@@ -188,10 +194,11 @@ open class RxPresenter<V : Any> : Presenter<V>() {
             val view = rxViewResultBoundData.view
             val notification = rxViewResultBoundData.data
 
+            // Consumer will be notified when view is not null
             when {
-                notification.isOnNext -> onNext?.accept(view, notification.value!!)
-                notification.isOnComplete -> onCompleted?.accept(view)
-                notification.isOnError -> onError?.accept(view, notification.error!!)
+                notification.isOnNext -> onNext?.accept(view!!, notification.value!!)
+                notification.isOnComplete -> onCompleted?.accept(view!!)
+                notification.isOnError -> onError?.accept(view!!, notification.error!!)
             }
 
             if (notification.isOnComplete || notification.isOnError) {

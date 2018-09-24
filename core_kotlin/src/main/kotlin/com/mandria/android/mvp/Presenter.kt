@@ -50,7 +50,7 @@ abstract class Presenter<out V : Any> {
     protected open fun onViewDetached() {
         MVPLogger.d(
             javaClass.simpleName,
-            String.format("View %s is detached to presenter", view?.toString())
+            String.format("View %s is detached from presenter", view?.toString())
         )
     }
 

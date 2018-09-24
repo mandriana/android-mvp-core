@@ -10,7 +10,7 @@ ext.versions = [
         mavenGradle    : "1.4.1",
 
         support        : "27.1.1",
-        androidx       : "1.0.0-rc02",
+        androidx       : "1.0.0",
         rxJava         : "2.1.8",
         rxAndroid      : "2.0.2",
         dagger         : "2.16",
