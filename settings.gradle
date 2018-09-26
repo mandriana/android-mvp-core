@@ -1,4 +1,4 @@
-include ':demo-dagger', ':demo_dagger_kotlin',
+include ':demo_dagger', ':demo_dagger_kotlin',
         ':core', ':core_kotlin',
         ':views',
         ':views_dagger',
