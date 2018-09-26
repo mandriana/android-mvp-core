@@ -1,9 +1,14 @@
 ext.conf = [
         bintray: [
+                // The common block is used to define common properties of your artifacts
                 common           : [
+                        // Your Bintray repository to publish on
                         repo            : 'mavenTest',
+
                         orgName         : 'michaelandria',
                         publishedGroupId: 'com.github.mandriana',
+
+                        // Your library version
                         libraryVersion  : '2.0.1',
 
                         siteUrl         : 'https://github.com/michaelandria/android-mvp-core',
@@ -17,6 +22,13 @@ ext.conf = [
                         allLicenses     : ["Apache-2.0"],
                         bintrayLabels   : ['aar', 'android', 'architecture', 'MVP'],
                 ],
+
+                //-------------------------
+                // Below, each configuration block matches a module (artifact) configuration.
+                // A block specifies properties for the corresponding module.
+                // If some properties in the 'common' block should be specific to a module,
+                // you can move it inside a module configuration block.
+                //-------------------------
 
                 core             : [
                         bintrayName       : 'mvp-core-rx2',
@@ -42,22 +54,22 @@ ext.conf = [
                 viewsKotlin      : [
                         bintrayName       : 'mvp-base-views-rx2-kt',
                         artifact          : 'mvp-base-views-rx2-kt',
-                        libraryName       : 'MVP base views',
-                        libraryDescription: 'A set of base views to be used with mvp-core'
+                        libraryName       : 'MVP base views - Kotlin',
+                        libraryDescription: 'A set of base views to be used with mvp-core and Kotlin'
                 ],
 
                 viewsDagger      : [
                         bintrayName       : 'mvp-base-views-rx2-dagger',
                         artifact          : 'mvp-base-views-rx2-dagger',
-                        libraryName       : 'MVP base views',
+                        libraryName       : 'MVP base views - Dagger',
                         libraryDescription: 'A set of base views to be used with mvp-core'
                 ],
 
                 viewsDaggerKotlin: [
                         bintrayName       : 'mvp-base-views-rx2-dagger-kt',
                         artifact          : 'mvp-base-views-rx2-dagger-kt',
-                        libraryName       : 'MVP base views',
-                        libraryDescription: 'A set of base views to be used with mvp-core'
+                        libraryName       : 'MVP base views - Dagger/Kotlin',
+                        libraryDescription: 'A set of base views to be used with mvp-core, Dagger 2 and Kotlin'
                 ],
 
                 viewsKoin        : [
@@ -80,6 +92,9 @@ ext.conf = [
         ]
 ]
 
+/**
+ * Common Bintray configuration.
+ */
 ext {
     bintrayRepo = conf.bintray.common.repo
     orgName = conf.bintray.common.orgName
@@ -102,15 +117,22 @@ ext {
     bintrayLabels = conf.bintray.common.bintrayLabels
 }
 
-ext.getAarFileNameForVariant = { artifact, version, variant ->
-    "${artifact}-${version}-${variant.buildType.name}.aar"
+/**
+ * Use this function to build and retrieve the aar output file name in your modules
+ * and in the maven publication
+ */
+ext.getAarFileNameForVariant = { artifact, version, buildTypeName ->
+    "${artifact}-${version}-${buildTypeName}.aar"
 }
 
+/**
+ * Set the aar output file for each variant.
+ */
 ext.defineOutputForAars = { artifact, version, libraryVariants ->
     libraryVariants.all { variant ->
         variant.outputs.all { output ->
             if (outputFileName != null && outputFileName.endsWith('.aar')) {
-                def fileName = getAarFileNameForVariant(artifact, version, variant)
+                def fileName = getAarFileNameForVariant(artifact, version, variant.buildType.name)
                 outputFileName = new File(fileName)
             }
         }

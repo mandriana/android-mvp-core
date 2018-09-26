@@ -3,8 +3,6 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-version = libraryVersion
-
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -19,20 +17,6 @@ task javadoc(type: Javadoc) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-// Retrieve credentials
-def _user = System.getenv("BINTRAY_USER")
-def _key = System.getenv("BINTRAY_API_KEY")
-def _passphrase = System.getenv("BINTRAY_PASSPHRASE")
-
-if (project.rootProject.file('local.properties').exists() && (_user == null || _user.isEmpty())) {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-    _user = properties.getProperty("bintray.user")
-    _key = properties.getProperty("bintray.apikey")
-    _passphrase = properties.getProperty("bintray.gpg.password")
 }
 
 // Pom configuration to append
@@ -65,7 +49,7 @@ publishing {
             artifactId = artifact
             version libraryVersion
 
-            artifact "$buildDir/outputs/aar/${artifact}-${version}-release.aar"
+            artifact "$buildDir/outputs/aar/" + getAarFileNameForVariant(artifact, version, 'release')
             artifact sourcesJar
             artifact javadocJar
 
@@ -78,27 +62,37 @@ publishing {
                 // creating additional node for dependencies
                 def dependenciesNode = asNode().appendNode('dependencies')
 
-                // defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ["releaseImplementation", "api"]
+                // defining configuration names from which dependencies will be taken (implementation or api)
+                def configurationNames = ["implementation", "api"]
 
                 configurationNames.each { configurationName ->
-                    // iterates over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
-                    configurations[configurationName].allDependencies.each {
-                        if (it.group != null && it.group != '' && it.group != 'unspecified'
-                                && it.name != null && it.name != '' && it.name != 'unspecified'
-                                && it.version != 'unspecified') {
+                    // iterates over the dependencies (we don't want the test ones), adding a <dependency> node for each
+                    configurations[configurationName].dependencies.each {Dependency dep ->
+                        if (dep.group != null && dep.group != '' && dep.group != 'unspecified'
+                                && dep.name != null && dep.name != '' && dep.name != 'unspecified'
+                                && dep.version != 'unspecified') {
                             def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
+                            dependencyNode.appendNode('groupId', dep.group)
+                            dependencyNode.appendNode('artifactId', dep.name)
+                            dependencyNode.appendNode('version', dep.version)
+                            if (configurationName == 'api') {
+                                dependencyNode.appendNode('scope', 'compile')
+                            } else if(configurationName == 'implementation') {
+                                dependencyNode.appendNode('scope', 'runtime')
+                            }
 
-                            //If there are any exclusions in dependency
-                            if (it.excludeRules.size() > 0) {
+                            if (!dep.transitive) {
+                                // If this dependency is transitive, we should force exclude all its dependencies them from the POM
+                                final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                                exclusionNode.appendNode('groupId', '*')
+                                exclusionNode.appendNode('artifactId', '*')
+                            } else if (!dep.properties.excludeRules.empty) {
+                                //If there are any exclusions in dependency
                                 def exclusionsNode = dependencyNode.appendNode('exclusions')
-                                it.excludeRules.each { rule ->
+                                dep.properties.excludeRules.each { ExcludeRule rule ->
                                     def exclusionNode = exclusionsNode.appendNode('exclusion')
-                                    exclusionNode.appendNode('groupId', rule.group)
-                                    exclusionNode.appendNode('artifactId', rule.module)
+                                    exclusionNode.appendNode('groupId', rule.group ?: '*')
+                                    exclusionNode.appendNode('artifactId', rule.module ?: '*')
                                 }
                             }
                         }
@@ -121,6 +115,20 @@ task publishLocal {
     //dependsOn ":${project.name}:clean"
     dependsOn ":${project.name}:assemble"
     dependsOn ":${project.name}:publish"
+}
+
+// Bintray credentials
+def _user = System.getenv("BINTRAY_USER")
+def _key = System.getenv("BINTRAY_API_KEY")
+def _passphrase = System.getenv("BINTRAY_PASSPHRASE")
+
+if (project.rootProject.file('local.properties').exists() && (_user == null || _user.isEmpty())) {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    _user = properties.getProperty("bintray.user")
+    _key = properties.getProperty("bintray.apikey")
+    _passphrase = properties.getProperty("bintray.gpg.password")
 }
 
 // Bintray dependencies and configuration
@@ -151,6 +159,7 @@ bintray {
                 passphrase = _passphrase
                 //Optional. The passphrase for GPG signing'
             }
+            released = new Date()
         }
     }
 }

@@ -4,12 +4,12 @@ ext.versions = [
         compileSdk     : 28,
         buildTools     : '28.0.2',
 
-        androidPlugin  : '3.2.0-rc03',
-        kotlin         : "1.2.70",
+        androidPlugin  : '3.2.0',
+        kotlin         : "1.2.71",
         gradleBintray  : "1.8.4",
         mavenGradle    : "1.4.1",
 
-        support        : "27.1.1",
+        support        : "28.0.0",
         androidx       : "1.0.0",
         rxJava         : "2.1.8",
         rxAndroid      : "2.0.2",

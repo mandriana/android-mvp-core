@@ -42,7 +42,7 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    defineOutputForAars(conf.bintray.coreKotlin.artifact, conf.bintray.common.libraryVersion,libraryVariants)
+    defineOutputForAars(conf.bintray.coreKotlin.artifact, conf.bintray.common.libraryVersion, libraryVariants)
 }
 
 dependencies {

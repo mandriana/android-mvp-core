@@ -41,7 +41,7 @@ dependencies {
     //implementation 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
 
     kapt deps.google.daggerProcessor
-    annotationProcessor deps.google.daggerAndroidCompiler
+    kapt deps.google.daggerAndroidCompiler
     implementation deps.google.daggerAndroid
     implementation deps.google.daggerAndroidSupport
 
