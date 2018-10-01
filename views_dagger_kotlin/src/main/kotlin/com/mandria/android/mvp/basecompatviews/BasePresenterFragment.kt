@@ -44,7 +44,7 @@ abstract class BasePresenterFragment<P : Presenter<*>> : Fragment(), HasPresente
     }
 
     override fun onDestroy() {
-        presenterProvider.detachViewFromPresenter(activity?.isChangingConfigurations ?: true)
+        presenterProvider.detachViewFromPresenter(!(activity?.isChangingConfigurations ?: true))
         super.onDestroy()
     }
 
