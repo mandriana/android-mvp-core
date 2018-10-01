@@ -20,9 +20,7 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
 
-/**
- * Created by michael on 19/04/2017.
- */
+
 public class TaskManager {
 
     private static final long DELAY = 5;

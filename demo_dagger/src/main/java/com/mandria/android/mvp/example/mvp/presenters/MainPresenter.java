@@ -13,9 +13,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
-/**
- * Created by michael on 19/04/2017.
- */
+
 public class MainPresenter extends RxPresenter<MainView> {
 
     private static final String TAG = "MainPresenter";
@@ -30,7 +28,7 @@ public class MainPresenter extends RxPresenter<MainView> {
     }
 
     public void doStuff() {
-        start(TASK_DO_STUFF, mTaskManager.longMaybe(), true,
+        start(TASK_DO_STUFF, mTaskManager.longFlowableTask(), true,
                 new OnNext<MainView, String>() {
                     @Override
                     public void accept(MainView mainView, String s) throws Exception {
@@ -49,6 +47,7 @@ public class MainPresenter extends RxPresenter<MainView> {
                     @Override
                     public void accept(@NonNull MainView mainView) {
                         Log.d(TAG, "Task completed");
+                        mainView.onTaskComplete();
                     }
                 });
     }

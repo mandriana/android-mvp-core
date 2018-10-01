@@ -11,9 +11,7 @@ import javax.inject.Singleton;
 import dagger.BindsInstance;
 import dagger.Component;
 
-/**
- * Created by michael on 19/04/2017.
- */
+
 @Singleton
 @Component(modules = {
         CoreModule.class,
@@ -21,8 +19,6 @@ import dagger.Component;
         PresenterModule.class
 })
 public interface AppComponent {
-
-    UserComponent.Builder createUserComponent();
 
     void inject(MainActivity mainActivity);
 

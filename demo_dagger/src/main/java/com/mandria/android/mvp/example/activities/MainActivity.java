@@ -1,6 +1,5 @@
 package com.mandria.android.mvp.example.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -16,6 +15,7 @@ import com.mandria.android.mvp.provider.PresenterClass;
 public class MainActivity extends BasePresenterActivity<MainPresenter> implements MainView {
 
     private TextView mResultTextView;
+    private TextView mCompleteTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +25,13 @@ public class MainActivity extends BasePresenterActivity<MainPresenter> implement
         setContentView(R.layout.activity_main);
 
         mResultTextView = findViewById(R.id.result_text);
+        mCompleteTextView = findViewById(R.id.complete_text);
 
         findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mResultTextView.setText(null);
+                mResultTextView.setText("Task started");
+                mCompleteTextView.setText(null);
                 getPresenter().doStuff();
             }
         });
@@ -38,8 +40,11 @@ public class MainActivity extends BasePresenterActivity<MainPresenter> implement
     @Override
     public void onTaskSuccess(String result) {
         mResultTextView.setText(result);
-        MVPApplication.makeUserComponent();
-        startActivity(new Intent(this, UserActivity.class));
+    }
+
+    @Override
+    public void onTaskComplete() {
+        mCompleteTextView.setText("Task completed");
     }
 
     @Override
