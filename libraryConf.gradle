@@ -3,7 +3,7 @@ ext.conf = [
                 // The common block is used to define common properties of your artifacts
                 common           : [
                         // Your Bintray repository to publish on
-                        repo            : 'mavenTest',
+                        repo            : 'maven',
 
                         orgName         : 'michaelandria',
                         publishedGroupId: 'com.github.mandriana',
