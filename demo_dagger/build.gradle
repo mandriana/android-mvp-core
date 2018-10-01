@@ -28,9 +28,6 @@ dependencies {
 
     implementation project(':core')
     implementation project(':views_dagger')
-    // MVP
-    //implementation 'com.github.mandriana:mvp-core-rx2:1.1.0'
-    //implementation 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
 
     annotationProcessor deps.google.daggerProcessor
     annotationProcessor deps.google.daggerAndroidCompiler

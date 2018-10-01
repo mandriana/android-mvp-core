@@ -10,7 +10,5 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun getTaskManager(): TaskManager {
-        return TaskManager()
-    }
+    fun getTaskManager(): TaskManager = TaskManager()
 }

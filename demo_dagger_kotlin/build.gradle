@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -36,9 +37,6 @@ dependencies {
 
     implementation project(':core_kotlin')
     implementation project(':views_dagger_kotlin')
-    // MVP
-    //implementation 'com.github.mandriana:mvp-core-rx2:1.1.0'
-    //implementation 'com.github.mandriana:mvp-base-views-rx2-dagger:1.1.0'
 
     kapt deps.google.daggerProcessor
     kapt deps.google.daggerAndroidCompiler
