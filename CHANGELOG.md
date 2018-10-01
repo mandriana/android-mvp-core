@@ -1,3 +1,6 @@
+## 2.0.1
+Added core and dagger-views kotlin versions.
+
 ## 2.0.0
 Migrated to androidx.
 

@@ -10,11 +10,18 @@ This version supports RxJava 2.
 
 Available on JCenter and MavenCentral. In your module :
 ```groovy
-compile 'com.github.mandriana:mvp-core-rx2:2.0.0'
+compile 'com.github.mandriana:mvp-core-rx2:2.0.1'
 // To use base views library
-compile 'com.github.mandriana:mvp-base-views-rx2:2.0.0'
+compile 'com.github.mandriana:mvp-base-views-rx2:2.0.1'
 // To use base views with dagger module library
-compile 'com.github.mandriana:mvp-base-views-rx2-dagger:2.0.0'
+compile 'com.github.mandriana:mvp-base-views-rx2-dagger:2.0.1'
+```
+
+If you use Kotlin :
+```groovy
+compile 'com.github.mandriana:mvp-core-rx2-kt:2.0.1'
+// To use base views with dagger module library
+compile 'com.github.mandriana:mvp-base-views-rx2-dagger-kt:2.0.1'
 ```
 
 # Wiki
